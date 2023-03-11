@@ -1,0 +1,5 @@
+require('theme')
+require('options')
+require('ui')
+require('keymap')
+require('plug-conf')
