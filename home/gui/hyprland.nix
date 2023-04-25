@@ -1,10 +1,27 @@
 {
   config,
   nix-colors,
+  pkgs,
   ...
-}: let
+} @ args: let
   xargb = c: "88${c}";
   x = config.colorScheme.colors;
+  shader_path = pkgs.writeTextFile {
+    name = "filter_colors.frag";
+    text = import ./cat-mocha.frag.nix args;
+  };
+  toggle_script = pkgs.writeShellApplication {
+    name = "shader_toggler";
+    runtimeInputs = with pkgs; [jaq];
+    text = ''
+      shader=$(hyprctl getoption decoration:screen_shader -j | jaq ".str")
+      if [[ $shader == "\"[[EMPTY]]\"" ]]; then
+      	hyprctl keyword decoration:screen_shader "${shader_path}"
+      else
+      	hyprctl keyword decoration:screen_shader "[[EMPTY]]"
+      fi
+    '';
+  };
 in ''
   # Variables
   $mod = SUPER
@@ -32,6 +49,7 @@ in ''
          shadow_range = 4
          shadow_render_power = 1
          col.shadow = 0x55000000
+         screen_shader = ${shader_path}
        }
 
        animations {
@@ -59,6 +77,7 @@ in ''
   		bind = $mod, R, exec, zsh -c 'rofi -show drun'
   		bind = $mod, M, exit
   		bind = $mod, V, togglefloating
+  		bind = $mod SHIFT, equal, exec, ${toggle_script}/bin/shader_toggler
 
        # media controls
        bindl = , XF86AudioPlay, exec, playerctl -a play-pause

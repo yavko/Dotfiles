@@ -1,12 +1,12 @@
 require('bufferline').setup {
 	highlights = require("catppuccin.groups.integrations.bufferline").get(),
 	options = {
-		mode = "buffers", -- set to "tabs" to only show tabpages instead
+		mode = "buffers",                  -- set to "tabs" to only show tabpages instead
 		numbers = "none",
-		close_command = "bdelete! %d", -- can be a string | function, see "Mouse actions"
+		close_command = "bdelete! %d",     -- can be a string | function, see "Mouse actions"
 		right_mouse_command = "bdelete! %d", -- can be a string | function, see "Mouse actions"
-		left_mouse_command = "buffer %d", -- can be a string | function, see "Mouse actions"
-		middle_mouse_command = nil, -- can be a string | function, see "Mouse actions"
+		left_mouse_command = "buffer %d",  -- can be a string | function, see "Mouse actions"
+		middle_mouse_command = nil,        -- can be a string | function, see "Mouse actions"
 		-- NOTE: this plugin is designed with this icon in mind,
 		-- and so changing this is NOT recommended, this is intended
 		-- as an escape hatch for people who cannot bear it for whatever reason
@@ -58,10 +58,13 @@ require('bufferline').setup {
 			end
 		end,
 		offsets = { { filetype = "NvimTree", text = "File Explorer" } },
-		color_icons = true, -- whether or not to add the filetype icon highlights
+		color_icons = true,     -- whether or not to add the filetype icon highlights
 		show_buffer_icons = true, -- disable filetype icons for buffers
 		show_buffer_close_icons = true,
-		show_buffer_default_icon = true, -- whether or not an unrecognised filetype should show a default icon
+		--show_buffer_default_icon = true, -- whether or not an unrecognised filetype should show a default icon
+		get_element_icon = function(e)
+			return require('nvim-web-devicons').get_icon_by_filetype(e.filetype, { default = false })
+		end,
 		show_close_icon = false,
 		show_tab_indicators = true,
 		persist_buffer_sort = true, -- whether or not custom sorted buffers should persist

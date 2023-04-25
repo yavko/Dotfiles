@@ -24,6 +24,7 @@
     in ''
       preload=${path}
       wallpaper=eDP-1,${path}
+      splash=true
       ipc=off
     '';
   };

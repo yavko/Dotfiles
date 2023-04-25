@@ -2,6 +2,21 @@ local wk = require("which-key")
 
 wk.setup()
 
+-- Documentation func
+local function show_documentation()
+	local filetype = vim.bo.filetype
+	if vim.tbl_contains({ 'vim', 'help' }, filetype) then
+		vim.cmd('h ' .. vim.fn.expand('<cword>'))
+	elseif vim.tbl_contains({ 'man' }, filetype) then
+		vim.cmd('Man ' .. vim.fn.expand('<cword>'))
+	elseif vim.fn.expand('%:t') == 'Cargo.toml' and require('crates').popup_available() then
+		require('crates').show_popup()
+	else
+		vim.lsp.buf.hover()
+	end
+end
+
+
 -- Normal Mode Mappings
 wk.register({
 	["<leader>"] = {
@@ -15,13 +30,13 @@ wk.register({
 		},
 		t = { '<cmd>NvimTreeToggle<CR>', "Toggles a file tree" }
 	},
-	K = { '<cmd>lua vim.lsp.buf.hover()<cr>', "Displays hover information about the symbol under the cursor." },
+	K = { show_documentation, "Displays hover information about the symbol under the cursor." },
 	g = {
 		name = "LSP stuff", -- optional group name
 		r = { '<cmd>lua vim.lsp.buf.rename()<cr>', "Renames all references to the symbol under the cursor." },
 		x = { '<cmd>lua vim.lsp.buf.code_action()<cr>', "Prompts the user for a code action to execute" },
-		--x = { '<c-u>LspCodeAction<cr>', description = "Prompts the user for a code action to execute, but with a range", }
-		-- 		mode = 'x' },
+		d = { '<cmd>lua vim.lsp.buf.definition()<cr>', "Jumps to the definition of a something" },
+		e = { '<cmd>lua vim.lsp.buf.definition()<cr>', "Shows refrences of something" },
 	},
 }, {})
 

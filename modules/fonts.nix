@@ -1,9 +1,4 @@
-{
-  config,
-  pkgs,
-  inputs,
-  ...
-}: {
+{pkgs, ...}: {
   fonts = {
     fonts = with pkgs; [
       # icon fonts
@@ -18,7 +13,7 @@
       roboto
 
       # nerdfonts
-      (nerdfonts.override {fonts = ["FiraCode" "JetBrainsMono"];})
+      (nerdfonts.override {fonts = ["FiraCode" "JetBrainsMono" "VictorMono"];})
     ];
 
     # use fonts specified by user rather than default ones
@@ -30,7 +25,7 @@
     fontconfig.defaultFonts = {
       serif = ["Noto Serif" "Noto Color Emoji"];
       sansSerif = ["Noto Sans" "Noto Color Emoji"];
-      monospace = ["JetBrainsMono Nerd Font" "Noto Color Emoji"];
+      monospace = ["JetBrainsMono Nerd Font" "FiraCode Nerd Font" "Noto Color Emoji"];
       emoji = ["Noto Color Emoji"];
     };
   };

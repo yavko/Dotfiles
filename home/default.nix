@@ -4,6 +4,6 @@
     ./gui
     ./develop
     ./media
-		./gaming
+    ./gaming
   ];
 }

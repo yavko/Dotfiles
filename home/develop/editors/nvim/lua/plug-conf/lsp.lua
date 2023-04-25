@@ -44,6 +44,8 @@ function on_attach(client, bufnr)
 	end
 
 	buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
+	buf_set_option("formatexpr", "v:lua.vim.lsp.formatexpr()")
+	buf_set_option("tagfunc", "v:lua.vim.lsp.tagfunc")
 end
 
 --local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -74,7 +76,7 @@ local null_ls = require("null-ls")
 
 null_ls.setup({
 	sources = {
-		--null_ls.builtins.formatting.stylua,
+		null_ls.builtins.formatting.stylua,
 		--null_ls.builtins.formatting.alejandra
 	},
 })
@@ -108,12 +110,12 @@ for _, server in ipairs(servers) do
 			if client.server_capabilities.documentSymbolProvider then
 				navic.attach(client, bufnr)
 			end
-			require "lsp_signature".on_attach({
-				bind = true, -- This is mandatory, otherwise border config won't get registered.
-				handler_opts = {
-					border = "rounded"
-				}
-			}, bufnr)
+			-- require "lsp_signature".on_attach({
+			-- 	bind = true, -- This is mandatory, otherwise border config won't get registered.
+			-- 	handler_opts = {
+			-- 		border = "rounded"
+			-- 	}
+			-- }, bufnr)
 		end,
 		settings = {}
 	}
@@ -121,13 +123,17 @@ for _, server in ipairs(servers) do
 --		config.root_dir = lspconfig.util.root_pattern("package.json")
 	elseif server == "denols" then
 		config.root_dir = lspconfig.util.root_pattern("deno.json")
-	elseif server == "jsonls" then
+	elseif server == "jsonls" or server == "yamlls" then
 		local ss_status, ss = pcall(require, "schemastore")
 		if ss_status then
-			config.schemas = ss.json.schemas()
+			if server == "jsonls" then
+				config.settings["json"].schemas = ss.json.schemas()
+			else
+				config.settings["yaml"].schemas = ss.yaml.schemas()
+			end
 		end
 		config.validate = { enable = true }
-	elseif serve == "nil_ls" then
+	elseif server == "nil_ls" then
 		config.autostart = true
 		config.settings["nil"] = {
 			testSetting = 42,
@@ -135,6 +141,21 @@ for _, server in ipairs(servers) do
 				command = { "alejandra" }
 			}
 		}
+	elseif server == "lua_ls" then
+		config.settings["Lua"] = {
+      runtime = {
+        version = 'LuaJIT',
+      },
+      diagnostics = {
+        globals = {'vim'},
+      },
+      workspace = {
+        library = vim.api.nvim_get_runtime_file("", true),
+      },
+      telemetry = {
+        enable = false,
+      },
+    }
 	elseif server == "rust_analyzer" then
 		config.settings["rust-analyzer"] = {
 			checkOnSave = {
@@ -245,3 +266,10 @@ require("trouble").setup({
 	},
 	use_diagnostic_signs = false, -- enabling this will use the signs defined in your lsp client
 })
+
+require('crates').setup {
+    null_ls = {
+        enabled = true,
+        name = "crates.nvim",
+    },
+}

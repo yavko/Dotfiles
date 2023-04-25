@@ -1,7 +1,7 @@
 {
   pkgs,
   lib,
-	inputs,
+  inputs,
   ...
 } @ args: {
   #home.packages = with pkgs; [ neovim ];
@@ -47,8 +47,8 @@
         gitsigns-nvim
         neogit
         telescope-nvim
-				vim-html-template-literals
-				vim-javascript
+        vim-html-template-literals
+        vim-javascript
 
         # LSP
         nvim-lspconfig
@@ -66,7 +66,7 @@
         #hlargs-nvim
         #schemastore-nvim
         rust-tools-nvim
-				nvim-jdtls
+        nvim-jdtls
         lspkind-nvim
 
         which-key-nvim
@@ -87,14 +87,17 @@
         cmp-nvim-lua
         cmp-omni
         cmp-treesitter
-        lsp_signature-nvim
+        #lsp_signature-nvim
+        crates-nvim
+        cmp-nvim-lsp-signature-help
+        cmp-nvim-lsp-document-symbol
+        cmp-emoji
+        cmp-greek
 
         # Treesitter
         (nvim-treesitter.withPlugins (_: pkgs.tree-sitter.allGrammars))
-        playground
         nvim-treesitter-context
         nvim-ts-rainbow
-        spellsitter-nvim
         comment-nvim
         nvim-ts-autotag
         nvim-treesitter-endwise

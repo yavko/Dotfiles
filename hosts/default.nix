@@ -25,6 +25,7 @@ inputs: let
     hyprland.nixosModules.default
     ../modules/fonts.nix
     ../modules/greetd.nix
+    aagl.nixosModules.default
   ];
   specialArgs = nixosExtraSpecialArgs;
 in {

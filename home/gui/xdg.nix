@@ -4,7 +4,7 @@
   ...
 }: let
   browser = ["firefox.desktop"];
-	fm = ["pcmanfm.desktop"];
+  fm = ["pcmanfm.desktop"];
   # XDG MIME types
   associations = {
     "application/x-extension-htm" = browser;
@@ -21,9 +21,9 @@
     "x-scheme-handler/https" = browser;
     "x-scheme-handler/unknown" = browser;
 
-		# File manager
-		"inode/directory" = fm;
-		"application/x-gnome-saved-search" = fm;
+    # File manager
+    "inode/directory" = fm;
+    "application/x-gnome-saved-search" = fm;
 
     "audio/*" = ["mpv.desktop"];
     "video/*" = ["mpv.dekstop"];

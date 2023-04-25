@@ -36,34 +36,17 @@ require('nvim-treesitter.configs').setup {
 			'#bd93f9', -- purple
 			'#e64747', -- red
 		}
-	},
-	playground = {
-		enable = true,
-		disable = {},
-		updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
-		persist_queries = false, -- Whether the query persists across vim sessions
-		keybindings = {
-			toggle_query_editor = 'o',
-			toggle_hl_groups = 'i',
-			toggle_injected_languages = 't',
-			toggle_anonymous_nodes = 'a',
-			toggle_language_display = 'I',
-			focus_language = 'f',
-			unfocus_language = 'F',
-			update = 'R',
-			goto_node = '<cr>',
-			show_help = '?',
-		},
 	}
 }
 
 require('nvim-autopairs').setup {}
 
 require 'treesitter-context'.setup {
-	enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
+	enable = true,  -- Enable this plugin (Can be enabled/disabled later via commands)
 	throttle = true, -- Throttles plugin updates (may improve performance)
-	max_lines = 0, -- How many lines the window should span. Values <= 0 mean no limit.
-	patterns = { -- Match patterns for TS nodes. These get wrapped to match at word boundaries.
+	max_lines = 0,  -- How many lines the window should span. Values <= 0 mean no limit.
+	patterns = {
+		-- Match patterns for TS nodes. These get wrapped to match at word boundaries.
 		-- For all filetypes
 		-- Note that setting an entry here replaces all other patterns for this entry.
 		-- By setting the 'default' entry below, you can control which nodes you want to
@@ -96,18 +79,15 @@ require('Comment').setup({
 	---Add a space b/w comment and the line
 	---@type boolean|fun():boolean
 	padding = true,
-
 	---Whether the cursor should stay at its position
 	---NOTE: This only affects NORMAL mode mappings and doesn't work with dot-repeat
 	---@type boolean
 	sticky = true,
-
 	---Lines to be ignored while comment/uncomment.
 	---Could be a regex string or a function that returns a regex string.
 	---Example: Use '^$' to ignore empty lines
 	---@type string|fun():string
 	ignore = nil,
-
 	---LHS of toggle mappings in NORMAL + VISUAL mode
 	---@type table
 	toggler = {
@@ -116,7 +96,6 @@ require('Comment').setup({
 		---Block-comment toggle keymap
 		block = 'gbc',
 	},
-
 	---LHS of operator-pending mappings in NORMAL + VISUAL mode
 	---@type table
 	opleader = {
@@ -125,7 +104,6 @@ require('Comment').setup({
 		---Block-comment keymap
 		block = 'gb',
 	},
-
 	---LHS of extra mappings
 	---@type table
 	extra = {
@@ -136,7 +114,6 @@ require('Comment').setup({
 		---Add comment at the end of line
 		eol = 'gcA',
 	},
-
 	---Create basic (operator-pending) and extended mappings for NORMAL + VISUAL mode
 	---NOTE: If `mappings = false` then the plugin won't create any mappings
 	---@type boolean|table
@@ -152,21 +129,16 @@ require('Comment').setup({
 		---Includes `g>`, `g<`, `g>[count]{motion}` and `g<[count]{motion}`
 		extended = false,
 	},
-
 	---Pre-hook, called before commenting the line
 	---@type fun(ctx: Ctx):string
 	pre_hook = nil,
-
 	---Post-hook, called after commenting is done
 	---@type fun(ctx: Ctx)
 	post_hook = nil,
 })
 -- "markdown", "md", "html", "txt", "js", "ts", "tsx", "jsx", "rst"
-require('spellsitter').setup {
-	enabled = true
-}
 
-local hl_status hlargs = pcall(require,'hlargs')
+local hl_status, hlargs = pcall(require, 'hlargs')
 if hl_status then
 	hlargs.setup {
 		color = "#50fa7b",

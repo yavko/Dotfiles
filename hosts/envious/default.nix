@@ -5,29 +5,23 @@
   config,
   pkgs,
   inputs,
+  lib,
   ...
 }: {
   nix = {
     #package = pkgs.nixFlakes;
+    registry = {
+      nixpkgs.flake = inputs.nixpkgs;
+    };
+
+    nixPath = ["nixpkgs=/etc/nix/inputs/nixpkgs"];
+
     settings = {
       auto-optimise-store = true;
+      #builders-use-substitutes = true;
       experimental-features = ["nix-command" "flakes"];
-      substituters = [
-        "https://nrdxp.cachix.org"
-        "https://hyprland.cachix.org"
-        "https://nix-community.cachix.org"
-        "https://helix.cachix.org"
-        "https://prismlauncher.cachix.org"
-        "https://jakestanger.cachix.org" # ironbar
-      ];
-      trusted-public-keys = [
-        "nrdxp.cachix.org-1:Fc5PSqY2Jm1TrWfm88l6cvGWwz3s93c6IOifQWnhNW4="
-        "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-        "helix.cachix.org-1:ejp9KQpR1FBI2onstMQ34yogDm4OgU2ru6lIwPvuCVs="
-        "prismlauncher.cachix.org-1:GhJfjdP1RFKtFSH3gXTIQCvZwsb2cioisOf91y/bK0w="
-        "jakestanger.cachix.org-1:VWJE7AWNe5/KOEvCQRxoE8UsI2Xs2nHULJ7TEjYm7mM=" # ironbar
-      ];
+      substituters = lib.substituters.urls;
+      trusted-public-keys = lib.substituters.keys;
       trusted-users = ["root" "@wheel"];
     };
   };
@@ -46,7 +40,7 @@
   boot.loader.systemd-boot.configurationLimit = 5;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
-	boot.kernelPackages = pkgs.linuxPackages_xanmod_latest;
+  boot.kernelPackages = pkgs.linuxPackages_xanmod_latest;
 
   networking.hostName = "envious"; # Define your hostname.
   #envious
@@ -68,24 +62,24 @@
   # Configure keymap in X11
 
   hardware.opengl.enable = true;
-	hardware.opengl.driSupport32Bit = true;
-  
-	programs.zsh.enable = true;
+  hardware.opengl.driSupport32Bit = true;
+
+  programs.zsh.enable = true;
   users.defaultUserShell = pkgs.zsh;
   environment.pathsToLink = ["/share/zsh"];
 
   age.identityPaths = ["/home/yavor/.ssh/id_ed25519"];
   age.secrets.pass.file = ../../secrets/pass.age;
-	age.secrets.downonspot = {
-		file = ../../secrets/downonspot.age;
-		path = "/home/yavor/music-downloads/settings.json";
-		mode = "774";
-	};
+  age.secrets.downonspot = {
+    file = ../../secrets/downonspot.age;
+    path = "/home/yavor/music-downloads/settings.json";
+    mode = "774";
+  };
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.yavor = {
     isNormalUser = true;
     description = "Yavor Kolev";
-    extraGroups = ["networkmanager" "wheel" "video" "input" "audio"];
+    extraGroups = ["networkmanager" "wheel" "video" "input" "audio" "scanner" "lp"];
     passwordFile = config.age.secrets.pass.path;
   };
 
@@ -128,7 +122,11 @@
     remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
     dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
-	programs.gamemode.enable = true;
+  programs.an-anime-game-launcher = {
+    enable = true;
+    #package = pkgs.an-anime-game-launcher;
+  };
+  programs.gamemode.enable = true;
 
   security = {
     # allow wayland lockers to unlock the screen
@@ -136,7 +134,7 @@
       #swaylock.text = "auth include login";
       kwallet.enableKwallet = true;
       gnome-keyring.enableGnomeKeyring = true;
-			greetd.enableGnomeKeyring = true;
+      greetd.enableGnomeKeyring = true;
     };
     rtkit.enable = true;
     sudo.wheelNeedsPassword = false;
@@ -148,9 +146,19 @@
   location.provider = "geoclue2";
 
   programs.hyprland.enable = true;
+  programs.hyprland.xwayland.hidpi = true;
+
+  programs.sway = {
+    enable = true;
+    #package = inputs.self.packages.${pkgs.hostPlatform.system}.sway-hidpi;
+  };
 
   programs.dconf.enable = true;
   programs.light.enable = true;
+  hardware = {
+    sane.enable = true;
+    sane.extraBackends = with pkgs; [epkowa];
+  };
   services = {
     blueman.enable = true;
     # needed for gnome3 pinentry
@@ -172,9 +180,34 @@
       jack.enable = true;
       pulse.enable = true;
     };
-    printing.enable = true;
+    nscd = {
+      enableNsncd = true;
+      enable = true;
+    };
+    printing = {
+      enable = true;
+      browsing = true;
+      #listenAddresses = ["*:631"];
+      allowFrom = ["all"];
+      defaultShared = true;
+      drivers = with pkgs; [epson-escpr2];
+    };
+    avahi = {
+      enable = true;
+      nssmdns = true;
+      publish = {
+        enable = true;
+        userServices = true;
+      };
+    };
+    avahi.openFirewall = true;
     flatpak.enable = true;
     ratbagd.enable = true;
+    hardware.openrgb = {
+      #enable = true;
+      package = pkgs.openrgb-with-all-plugins;
+      #motherboard = "intel";
+    };
     tlp = {
       enable = true;
       settings = {
@@ -188,25 +221,25 @@
     gvfs.enable = true;
     # needed for GNOME services outside of GNOME Desktop
     udev = {
-			# add support for CMSIS-DAP debug probes without root
-			# and add support for using numworks website
-			extraRules = ''
-ACTION!="add|change", GOTO="probe_rs_rules_end"
+      # add support for CMSIS-DAP debug probes without root
+      # and add support for using numworks website
+      extraRules = ''
+        ACTION!="add|change", GOTO="probe_rs_rules_end"
 
-SUBSYSTEM=="gpio", MODE="0660", GROUP="plugdev", TAG+="uaccess"
+        SUBSYSTEM=="gpio", MODE="0660", GROUP="plugdev", TAG+="uaccess"
 
-SUBSYSTEM!="usb|tty|hidraw", GOTO="probe_rs_rules_end"
+        SUBSYSTEM!="usb|tty|hidraw", GOTO="probe_rs_rules_end"
 
-ATTRS{product}=="*CMSIS-DAP*", MODE="660", GROUP="plugdev", TAG+="uaccess"
+        ATTRS{product}=="*CMSIS-DAP*", MODE="660", GROUP="plugdev", TAG+="uaccess"
 
-LABEL="probe_rs_rules_end"
+        LABEL="probe_rs_rules_end"
 
 
-SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="a291", TAG+="uaccess"
-SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="df11", TAG+="uaccess"
-			'';
-			packages = with pkgs; [gnome.gnome-settings-daemon];
-		};
+        SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="a291", TAG+="uaccess"
+        SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="df11", TAG+="uaccess"
+      '';
+      packages = with pkgs; [gnome.gnome-settings-daemon];
+    };
   };
 
   xdg.portal.enable = true;
@@ -239,6 +272,8 @@ SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="df11", TAG+="uaccess
         to = 1764;
       } # KDE Connect
     ];
+    allowedTCPPorts = [631];
+    allowedUDPPorts = [631];
     allowedUDPPortRanges = [
       {
         from = 1714;
@@ -246,8 +281,8 @@ SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="df11", TAG+="uaccess
       } # KDE Connect
     ];
   };
-	#networking.wireless.iwd.enable = true;
-	#networking.networkmanager.wifi.backend = "iwd";
+  #networking.wireless.iwd.enable = true;
+  #networking.networkmanager.wifi.backend = "iwd";
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 

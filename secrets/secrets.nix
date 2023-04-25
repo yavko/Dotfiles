@@ -4,5 +4,5 @@ let
   ];
 in {
   "pass.age".publicKeys = yavko;
-	"downonspot.age".publicKeys = yavko;
+  "downonspot.age".publicKeys = yavko;
 }

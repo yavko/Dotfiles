@@ -75,7 +75,7 @@ in {
           "thumbnails"
           "fetchart"
           "embedart"
-          "acousticbrainz"
+          # DEPRECATED "acousticbrainz"
           "chroma"
           "fromfilename"
           "lastgenre"

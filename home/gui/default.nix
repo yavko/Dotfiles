@@ -1,4 +1,17 @@
-{pkgs, ...} @ args: {
+{
+  pkgs,
+  inputs,
+  ...
+} @ args: let
+  wl-screenrec = pkgs.rustPlatform.buildRustPackage {
+    pname = "wl-screenrec";
+    version = "0.1.0";
+    src = inputs.wl-screenrec;
+    cargoDeps = pkgs.rustPlatform.importCargoLock {lockFile = inputs.wl-screenrec + "/Cargo.lock";};
+    cargoLock.lockFile = inputs.wl-screenrec + "/Cargo.lock";
+    nativeBuildInputs = with pkgs; [pkg-config];
+  };
+in {
   home.packages = with pkgs; [
     pantheon.pantheon-agent-polkit
     qalculate-gtk
@@ -14,13 +27,13 @@
     brightnessctl
     wl-clipboard
     itd
-		xorg.xcursorgen
-		#iwgtk
+    xorg.xcursorgen
+    #iwgtk
   ];
   imports = [
     ./eww
     ./dunst.nix
-    #./ironbar.nix
+    ./ironbar.nix
     ./kvantum.nix
     ./rofi.nix
     ./wallpaper.nix
@@ -40,7 +53,7 @@
 
   home.pointerCursor = {
     package = pkgs.catppuccin-cursors.mochaDark; #pkgs.bibata-cursors;
-    name = "Catppuccin-Mocha-Dark-Cursors";#"Bibata-Modern-Classic";
+    name = "Catppuccin-Mocha-Dark-Cursors"; #"Bibata-Modern-Classic";
     size = 24;
     gtk.enable = true;
     x11.enable = true;
@@ -54,11 +67,16 @@
   wayland.windowManager.hyprland = {
     enable = true;
     extraConfig = import ./hyprland.nix args;
+    #package = pkgs.hyprland-hidpi;
+    xwayland = {
+      enable = true;
+      hidpi = true;
+    };
   };
 
   services = {
     nextcloud-client = {
-      enable = true;
+      #enable = true;
       startInBackground = true;
     };
     kdeconnect.enable = true;

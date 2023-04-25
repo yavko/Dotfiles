@@ -9,8 +9,15 @@
     "nil-ls"
     "tsserver"
     "bashls"
-		"jdtls"
-		"clangd"
+    "jdtls"
+    "clangd"
+    "cssls"
+    "html"
+    "jsonls"
+    "lua-ls"
+    "ltex"
+    "marksman"
+    "yamlls"
   ];
   genHelixLSP = {
     pkg,
@@ -41,25 +48,32 @@
     else {
       name = name;
     };
-		createAlias = newName: pkg: bin: pkgs.symlinkJoin {
-			name = newName;
-			paths = [ (pkgs.writeShellScriptBin "${newName}" "${pkgs.${pkg}}/bin/${bin} $@") pkgs.${pkg} ];
-			buildInputs = [ pkgs.makeWrapper ];
-			postBuild = "wrapProgram $out/bin/${newName} --prefix PATH : $out/bin";
-		};
-		createAliasSame = newName: pkg: createAlias newName pkg pkg;
+  createAlias = newName: pkg: bin:
+    pkgs.symlinkJoin {
+      name = newName;
+      paths = [(pkgs.writeShellScriptBin "${newName}" "${pkgs.${pkg}}/bin/${bin} $@") pkgs.${pkg}];
+      buildInputs = [pkgs.makeWrapper];
+      postBuild = "wrapProgram $out/bin/${newName} --prefix PATH : $out/bin";
+    };
+  createAliasSame = newName: pkg: createAlias newName pkg pkg;
 
-		jdtls = createAliasSame "jdtls" "jdt-language-server";
+  jdtls = createAliasSame "jdtls" "jdt-language-server";
 in {
   home.packages = with pkgs; [
     nil
     alejandra
     rust-analyzer
-		jdt-language-server
-		jdtls
+    jdt-language-server
+    jdtls
     nodePackages.bash-language-server
     nodePackages.typescript-language-server
-		clang-tools
+    nodePackages.vscode-langservers-extracted
+    nodePackages.yaml-language-server
+    clang-tools
+    lua-language-server
+    stylua
+    ltex-ls
+    marksman
   ];
   programs.neovim.plugins = [
     (pkgs.vimUtils.buildVimPlugin {
