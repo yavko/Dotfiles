@@ -30,7 +30,29 @@
           workspaces (_: "●");
       };
 
-      music = {
+      music = let
+        state_path = "${config.xdg.stateHome}/music-ctrls-state";
+        show-script = pkgs.writeShellApplication {
+          name = "mctrls-shower";
+          text = ''
+            touch ${state_path}
+            out=$(< ${state_path})
+            if [[ $out != "show" ]]; then
+              echo -ne "show" > ${state_path}
+            fi
+          '';
+        };
+        hide-script = pkgs.writeShellApplication {
+          name = "mctrls-hider";
+          text = ''
+            touch ${state_path}
+            out=$(< ${state_path})
+            if [[ $out == "show" ]]; then
+              echo -ne "" >${state_path}
+            fi
+          '';
+        };
+      in {
         type = "music";
         player_type = "mpris";
         format = "{title}";
@@ -38,12 +60,101 @@
         icons.play = "icon:media-playback-start";
         icons.pause = "icon:media-playback-pause";
         music_dir = config.xdg.userDirs.music;
+        show_status_icon = false;
+        on_mouse_enter.cmd = "${show-script}/bin/mctrls-shower";
+        on_mouse_exit.cmd = "${hide-script}/bin/mctrls-hider";
         #icon_size = 64;
         #cover_image_size = 256;
+      };
+      music_img = rec {
+        type = "custom";
+        name = "music-img";
+        class = name;
+        on_mouse_enter = music.on_mouse_enter;
+        on_mouse_exit = music.on_mouse_exit;
+        bar = [
+          {
+            type = "image";
+            class = name + "-img";
+            src = ''{{poll:5000:playerctl metadata mpris:artUrl}}'';
+            #src = ''{{watch:playerctl -F metadata mpris:artUrl}}'';
+          }
+        ];
+      };
+      music_inline_controls = let
+        check-script = pkgs.writeShellApplication {
+          name = "mctrls-checker";
+          text = let
+            state_path = "${config.xdg.stateHome}/music-ctrls-state";
+          in ''
+            touch ${state_path}
+            if [[ $(< ${state_path}) == "show" ]]; then
+            	exit 0
+            else
+            	exit 1
+            fi
+          '';
+        };
+        play-icon-script = pkgs.writeShellApplication {
+          name = "pp-icon";
+          runtimeInputs = [pkgs.playerctl];
+          text = ''
+            if [[ $(${pkgs.playerctl}/bin/playerctl status) == "Playing" ]]; then
+            	echo ""
+            else
+            	echo ""
+            fi
+          '';
+        };
+      in rec {
+        type = "custom";
+        name = "music-ctrls";
+        class = name;
+        show_if = {
+          mode = "poll";
+          interval = 500;
+          cmd = "${check-script}/bin/mctrls-checker";
+        };
+        on_mouse_enter = music.on_mouse_enter;
+        on_mouse_exit = music.on_mouse_exit;
+        transition_type = "slide_start";
+        bar = let
+          pctl = cmd:
+            "!"
+            + (pkgs.writeShellApplication {
+              name = "iron-${cmd}";
+              runtimeInputs = [pkgs.playerctl];
+              text = "${pkgs.playerctl}/bin/playerctl ${cmd}";
+            })
+            + "/bin/iron-${cmd}";
+        in [
+          {
+            type = "button";
+            class = name + "-prev";
+            label = "玲";
+            on_click = pctl "previous";
+          }
+          {
+            type = "button";
+            class = name + "-pp";
+            label = "{{poll:100:${play-icon-script}/bin/pp-icon}}";
+            on_click = pctl "play-pause";
+          }
+          {
+            type = "button";
+            class = name + "-next";
+            label = "怜";
+            on_click = pctl "next";
+          }
+        ];
       };
       sys_info = {
         type = "sys_info";
         format = [" {cpu_percent}%" " {memory_percent}%"];
+      };
+      battery = {
+        type = "upower";
+        format = "{percentage}%";
       };
 
       tray = {type = "tray";};
@@ -60,7 +171,17 @@
         on_click = "popup:toggle";
       };
 
-      up_full = "{{30000:uptime -p | cut -d ' ' -f2-}}";
+      up_full = let
+        uptime-script = pkgs.writeShellApplication {
+          name = "fmt-uptime";
+          text = ''
+            all=$(uptime | sed -E 's/.+up  //gm;t;d' | sed -E 's/,.+//gm;t;d')
+            m=$(sed -E 's/.*://gm;t;d' <<< "$all")
+            h=$(sed -E 's/:.*//gm;t;d' <<< "$all")
+            echo -ne "$h Hours, $m Minutes"
+          '';
+        };
+      in "{{30000:${uptime-script}/bin/fmt-uptime}}";
 
       power_popup = {
         type = "box";
@@ -106,31 +227,6 @@
         tooltip = "Up: ${up_full}";
       };
 
-      music_img = rec {
-        type = "custom";
-        name = "music-img";
-        class = name;
-        bar = [
-          {
-            type = "image";
-            class = name + "-img";
-            #src = ''{{poll:5000:playerctl metadata mpris:artUrl | sed -E "s/file:\/\/\///"}}'';
-            src = ''{{watch:playerctl -F metadata mpris:artUrl}}'';
-          }
-        ];
-      };
-
-      music_img_test = rec {
-        type = "custom";
-        name = "music-img-test";
-        class = name;
-        bar = [
-          {
-            type = "label";
-            label = ''file:///{{poll:5000:playerctl metadata mpris:artUrl | sed -E "s/file:\/\/\///"}}'';
-          }
-        ];
-      };
       nix_launch = rec {
         type = "custom";
         name = "nix-launcher";
@@ -152,13 +248,14 @@
       right = [
         tray
         sys_info
+        #battery
         power_menu
         clock
       ];
       center = [
         music_img
-        #music_img_test
         music
+        music_inline_controls
       ];
     in {
       anchor_to_edges = true;
@@ -295,6 +392,10 @@
       						border-radius: 8px;
       						margin-right: 8px;
       								}
+      					#music-ctrls {
+      						all: unset;
+      						margin-left: 5px;
+      					}
 
                        #music {
                            background-color: ${bg};

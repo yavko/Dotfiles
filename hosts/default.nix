@@ -13,6 +13,7 @@ inputs: let
     hm.nixosModule
     agenix.nixosModules.default
     nur.nixosModules.nur
+    nix-index-database.nixosModules.nix-index
     {
       home-manager = {
         useGlobalPkgs = true;

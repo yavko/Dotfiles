@@ -1,7 +1,7 @@
 # Cat NixOS dots
-> loosely copied from @fufexan's[^fuf] dots
+> structure similar to @fufexan's[^fuf] dots
 
-My Catppuccin[^cat] dotfiles written in nix, managed with home-manager[^hm]
+My Catppuccin[^cat] themed dotfiles written in nix, managed with home-manager[^hm] & NixOS
 
 ## Meta
 

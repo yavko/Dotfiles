@@ -6,10 +6,9 @@
   config,
   ...
 }: let
-  path = builtins.fetchurl {
-    url = "https://raw.githubusercontent.com/catppuccin/wallpapers/main/misc/cat-sound.png";
-    sha256 = "5c2dc947e37e6c98938dc2fd9dabdfc074a0594467e7668f4c3d846fedf9fdfa";
-  };
+  wallpkgs = inputs.wallpkgs.packages.${pkgs.system}.catppuccin;
+
+  path = "${wallpkgs}/share/wallpapers/catppuccin/05.png";
   greetdSwayConfig = pkgs.writeText "greetd-sway-config" ''
     exec "dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP"
     input "type:touchpad" {
@@ -47,11 +46,13 @@ in {
   programs.regreet = {
     enable = true;
     settings = {
-      background = path;
-      background_fit = "Cover";
+      background = {
+        inherit path;
+        fit = "Cover";
+      };
       GTK = {
         cursor_theme_name = "Catppuccin-Mocha-Dark-Cursors";
-        font_name = "Roboto * 12";
+        font_name = "Roboto 12";
         icon_theme_name = "Papirus-Dark";
         theme_name = "Catppuccin-Mocha-Compact-Peach-Dark";
       };

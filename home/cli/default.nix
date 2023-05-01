@@ -1,44 +1,17 @@
-{pkgs, ...}: let
-  vividPkg = pkgs.rustPlatform.buildRustPackage {
-    pname = "vivid";
-    version = "0.9.0";
-
-    src = pkgs.fetchFromGitHub {
-      owner = "sharkdp";
-      repo = "vivid";
-      rev = "9299aa4c843bb7ed757b47bb2449abbba3aed793";
-      sha256 = "sha256-gzl4ETkwnSuSKA0g7udOdFbnG1poXU/ZQyDJj/zqOV4=";
-    };
-
-    cargoSha256 = "sha256-4BpaEjh2SWAObprAXs6cYGuoc9tky6DNdkUVZ8AHkK4=";
-
-    meta = with pkgs.lib; {
-      description = "A generator for LS_COLORS with support for multiple color themes";
-      homepage = "https://github.com/sharkdp/vivid";
-      license = with licenses; [
-        asl20
-        /*
-        or
-        */
-        mit
-      ];
-      maintainers = [maintainers.dtzWill];
-      platforms = platforms.unix;
-    };
-  };
-in {
+{pkgs, ...}: {
   imports = [
     ./bat.nix
     ./cava.nix
     ./macchina.nix
     ./zsh.nix
     ./btop.nix
+    ./zellij.nix
   ];
   home.packages = with pkgs; [
     trashy
     socat
     unzip
-    vividPkg
+    vivid
   ];
   programs.kitty = {
     enable = true;
@@ -46,6 +19,9 @@ in {
     settings = {
       confirm_os_window_close = "0";
     };
+  };
+  programs.zoxide = {
+    enable = true;
   };
 
   programs.fzf = {
@@ -56,4 +32,6 @@ in {
       "--color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8"
     ];
   };
+  programs.nix-index.enable = true;
+  programs.command-not-found.enable = false;
 }

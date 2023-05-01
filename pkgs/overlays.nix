@@ -1,5 +1,5 @@
 inputs: _: prev: {
-  catppuccin-plymouth = prev.callPackage ./catppuccin-plymouth.nix {};
+  catppuccin-plymouth = prev.callPackage ./cat-plymouth.nix {};
 
-  #sway-hidpi = import ./sway-hidpi.nix inputs prev;
+  sway-hidpi = import ./sway-hidpi.nix inputs prev;
 }

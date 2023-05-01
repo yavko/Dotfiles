@@ -62,6 +62,22 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.rust-overlay.follows = "rust-overlay";
     };
+    anyrun = {
+      url = "github:Kirottu/anyrun";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hpr_scratcher = {
+      #url = "github:yavko/hpr_scratcher";
+      url = "/home/yavor/Projects/External/hpr-scratcher";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hy3 = {
+      url = "github:outfoxxed/hy3";
+      inputs.hyprland.follows = "hyprland";
+    };
+    nix-index-database.url = "github:Mic92/nix-index-database";
+    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
+    wallpkgs.url = "github:notashelf/wallpkgs";
 
     # non OS stuff
     papirus-folders-yavko = {
@@ -95,13 +111,9 @@
         {config._module.args._inputs = inputs // {inherit (inputs) self;};}
         ./pkgs
       ];
-      flake = rec {
+      flake = {
         lib = import ./lib.nix inputs;
         nixosConfigurations = import ./hosts inputs;
-        nixConfig = {
-          extra-substituters = lib.substituters.urls;
-          extra-trusted-public-keys = lib.substituters.keys;
-        };
       };
       perSystem = {
         config,
@@ -110,7 +122,8 @@
         system,
         ...
       }: {
-        imports = [{_module.args.pkgs = inputs.self.legacyPackages.${system};}];
+        #legacyPackages.${system} = inputs.nixpkgs.legacyPackages.${system};
+        imports = [{_module.args.pkgs = inputs.nixpkgs.legacyPackages.${system};}];
         devShells.default = inputs'.devshell.legacyPackages.mkShell {
           packages = [
             pkgs.alejandra
@@ -122,4 +135,24 @@
         formatter = pkgs.alejandra;
       };
     };
+  nixConfig = {
+    extra-substituters = [
+      "https://nrdxp.cachix.org"
+      "https://hyprland.cachix.org"
+      "https://nix-community.cachix.org"
+      "https://helix.cachix.org"
+      "https://prismlauncher.cachix.org"
+      "https://jakestanger.cachix.org" # ironbar
+      "https://ezkea.cachix.org" # for aagl (if you know, you know)
+    ];
+    extra-trusted-public-keys = [
+      "nrdxp.cachix.org-1:Fc5PSqY2Jm1TrWfm88l6cvGWwz3s93c6IOifQWnhNW4="
+      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "helix.cachix.org-1:ejp9KQpR1FBI2onstMQ34yogDm4OgU2ru6lIwPvuCVs="
+      "prismlauncher.cachix.org-1:GhJfjdP1RFKtFSH3gXTIQCvZwsb2cioisOf91y/bK0w="
+      "jakestanger.cachix.org-1:VWJE7AWNe5/KOEvCQRxoE8UsI2Xs2nHULJ7TEjYm7mM=" # ironbar
+      "ezkea.cachix.org-1:ioBmUbJTZIKsHmWWXPe1FSFbeVe+afhfgqgTSNd34eI=" # aagl (if you know, you know)
+    ];
+  };
 }

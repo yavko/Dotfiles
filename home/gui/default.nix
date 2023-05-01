@@ -1,17 +1,4 @@
-{
-  pkgs,
-  inputs,
-  ...
-} @ args: let
-  wl-screenrec = pkgs.rustPlatform.buildRustPackage {
-    pname = "wl-screenrec";
-    version = "0.1.0";
-    src = inputs.wl-screenrec;
-    cargoDeps = pkgs.rustPlatform.importCargoLock {lockFile = inputs.wl-screenrec + "/Cargo.lock";};
-    cargoLock.lockFile = inputs.wl-screenrec + "/Cargo.lock";
-    nativeBuildInputs = with pkgs; [pkg-config];
-  };
-in {
+{pkgs, ...} @ args: {
   home.packages = with pkgs; [
     pantheon.pantheon-agent-polkit
     qalculate-gtk
@@ -34,11 +21,14 @@ in {
     ./eww
     ./dunst.nix
     ./ironbar.nix
+    ./anyrun.nix
+    ./hpr_scratcher.nix
     ./kvantum.nix
     ./rofi.nix
     ./wallpaper.nix
     ./xdg.nix
     ./productivity.nix
+    ./wl-screenrec.nix
   ];
 
   programs = {
@@ -67,6 +57,7 @@ in {
   wayland.windowManager.hyprland = {
     enable = true;
     extraConfig = import ./hyprland.nix args;
+    plugins.hy3.enable = true;
     #package = pkgs.hyprland-hidpi;
     xwayland = {
       enable = true;

@@ -35,7 +35,12 @@
   hardware.bluetooth.enable = true;
 
   # Bootloader.
-  boot.plymouth.enable = true;
+  boot.plymouth = {
+    enable = true;
+    themePackages = [inputs.self.packages.${pkgs.hostPlatform.system}.catppuccin-plymouth];
+    theme = "catppuccin-mocha";
+    #font = "${pkgs.nerdfonts.override {fonts = ["VictorMono"];}}/share/fonts/truetype/NerdFonts/Victor\ Mono\ Regular\ Nerd\ Font\ Complete\ Mono.ttf";
+  };
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 5;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -67,6 +72,8 @@
   programs.zsh.enable = true;
   users.defaultUserShell = pkgs.zsh;
   environment.pathsToLink = ["/share/zsh"];
+  programs.nix-index.enable = true;
+  programs.command-not-found.enable = false;
 
   age.identityPaths = ["/home/yavor/.ssh/id_ed25519"];
   age.secrets.pass.file = ../../secrets/pass.age;
@@ -117,6 +124,7 @@
     ];
 
   programs._1password-gui.enable = true;
+  programs._1password-gui.polkitPolicyOwners = ["yavor"];
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
