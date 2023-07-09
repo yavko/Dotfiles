@@ -1,7 +1,6 @@
 {
   pkgs,
   inputs,
-  default,
   lib,
   config,
   ...
@@ -36,10 +35,14 @@ in {
       accents = ["peach"];
       variant = "mocha";
     })
-    #bibata-cursors
     catppuccin-cursors.mochaDark
-    (papirus-icon-theme.override {color = "orange";})
-    cage
+    (
+      catppuccin-papirus-folders.override {
+        flavor = "mocha";
+        accent = "peach";
+      }
+    )
+    #cage
     #greetd.gtkgreet
   ];
 
@@ -54,16 +57,16 @@ in {
         cursor_theme_name = "Catppuccin-Mocha-Dark-Cursors";
         font_name = "Roboto 12";
         icon_theme_name = "Papirus-Dark";
-        theme_name = "Catppuccin-Mocha-Compact-Peach-Dark";
+        theme_name = "Catppuccin-Mocha-Compact-Peach-dark";
       };
     };
   };
 
   services.greetd.settings.default_session.command = "${config.programs.sway.package}/bin/sway --config ${greetdSwayConfig}";
 
-  #environment.etc."greetd/environments".text = ''
-  #  Hyprland
-  #  zsh
-  #'';
-  security.pam.services.greetd.gnupg.enable = true;
+  security.pam.services = {
+    greetd.enableGnomeKeyring = true;
+    greetd.enableKwallet = true;
+    greetd.gnupg.enable = true;
+  };
 }

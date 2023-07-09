@@ -8,72 +8,55 @@
   lib,
   ...
 }: {
-  nix = {
-    #package = pkgs.nixFlakes;
-    registry = {
-      nixpkgs.flake = inputs.nixpkgs;
-    };
-
-    nixPath = ["nixpkgs=/etc/nix/inputs/nixpkgs"];
-
-    settings = {
-      auto-optimise-store = true;
-      #builders-use-substitutes = true;
-      experimental-features = ["nix-command" "flakes"];
-      substituters = lib.substituters.urls;
-      trusted-public-keys = lib.substituters.keys;
-      trusted-users = ["root" "@wheel"];
-    };
+  documentation = {
+    enable = true;
+    doc.enable = false;
+    man.enable = true;
+    dev.enable = false;
   };
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    #./fonts.nix
-    #./greetd.nix
   ];
-
-  hardware.bluetooth.enable = true;
-
-  # Bootloader.
-  boot.plymouth = {
+  zramSwap = {
     enable = true;
-    themePackages = [inputs.self.packages.${pkgs.hostPlatform.system}.catppuccin-plymouth];
-    theme = "catppuccin-mocha";
-    #font = "${pkgs.nerdfonts.override {fonts = ["VictorMono"];}}/share/fonts/truetype/NerdFonts/Victor\ Mono\ Regular\ Nerd\ Font\ Complete\ Mono.ttf";
+    algorithm = "zstd";
   };
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.systemd-boot.configurationLimit = 5;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.efi.efiSysMountPoint = "/boot/efi";
-  boot.kernelPackages = pkgs.linuxPackages_xanmod_latest;
-
-  networking.hostName = "envious"; # Define your hostname.
-  #envious
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
-  networking.networkmanager.enable = true;
+  systemd.oomd = {
+    enableRootSlice = true;
+    enableUserServices = true;
+  };
 
   # Set your time zone.
-  time.timeZone = "America/Los_Angeles";
+  time.timeZone = "Europe/Sofia"; # "America/Los_Angeles";
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.utf8";
 
   # Configure keymap in X11
 
-  hardware.opengl.enable = true;
-  hardware.opengl.driSupport32Bit = true;
+  hardware.opengl = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver # LIBVA_DRIVER_NAME=iHD
+      vaapiIntel # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
+      vaapiVdpau
+      libvdpau-va-gl
+    ];
+    extraPackages32 = with pkgs.pkgsi686Linux; [vaapiIntel vaapiVdpau intel-media-driver libvdpau-va-gl];
+    driSupport32Bit = true;
+  };
+  environment.variables = {
+    VDPAU_DRIVER = lib.mkIf config.hardware.opengl.enable (lib.mkDefault "va_gl");
+    LIBVA_DRIVER_NAME = "iHD";
+  };
+  boot.initrd.kernelModules = ["i915"];
+  console.font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-v32n.psf.gz";
+  console.earlySetup = lib.mkDefault true;
 
   programs.zsh.enable = true;
   users.defaultUserShell = pkgs.zsh;
-  environment.pathsToLink = ["/share/zsh"];
-  programs.nix-index.enable = true;
-  programs.command-not-found.enable = false;
+  environment.pathsToLink = ["/share/zsh" "/share/bash-completion" "/share/nix-direnv"];
 
   age.identityPaths = ["/home/yavor/.ssh/id_ed25519"];
   age.secrets.pass.file = ../../secrets/pass.age;
@@ -114,15 +97,21 @@
     };
   in
     with pkgs; [
-      #git
-      #kitty
+      git
       glib
       slurp
       steam
-      #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-      #  wget
+      via
+      vial
+      sbctl
     ];
+  environment.etc = with inputs; {
+    "nix/flake-channels/system".source = self;
+    "nix/flake-channels/nixpkgs".source = nixpkgs;
+    "nix/flake-channels/home-manager".source = hm;
+  };
 
+  programs._1password.enable = true;
   programs._1password-gui.enable = true;
   programs._1password-gui.polkitPolicyOwners = ["yavor"];
   programs.steam = {
@@ -130,23 +119,11 @@
     remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
     dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
-  programs.an-anime-game-launcher = {
-    enable = true;
-    #package = pkgs.an-anime-game-launcher;
-  };
+  programs.anime-game-launcher.enable = true;
+  programs.honkers-railway-launcher.enable = true;
+  programs.honkers-launcher.enable = true;
+  programs.anime-borb-launcher.enable = true;
   programs.gamemode.enable = true;
-
-  security = {
-    # allow wayland lockers to unlock the screen
-    pam.services = {
-      #swaylock.text = "auth include login";
-      kwallet.enableKwallet = true;
-      gnome-keyring.enableGnomeKeyring = true;
-      greetd.enableGnomeKeyring = true;
-    };
-    rtkit.enable = true;
-    sudo.wheelNeedsPassword = false;
-  };
 
   # use Wayland where possible
   environment.variables.NIXOS_OZONE_WL = "1";
@@ -168,9 +145,8 @@
     sane.extraBackends = with pkgs; [epkowa];
   };
   services = {
-    blueman.enable = true;
     # needed for gnome3 pinentry
-    dbus.packages = [pkgs.gcr];
+    dbus.packages = with pkgs; [dconf gcr udisks2];
     gnome.gnome-keyring.enable = true;
     # provide location
     geoclue2 = {
@@ -188,27 +164,6 @@
       jack.enable = true;
       pulse.enable = true;
     };
-    nscd = {
-      enableNsncd = true;
-      enable = true;
-    };
-    printing = {
-      enable = true;
-      browsing = true;
-      #listenAddresses = ["*:631"];
-      allowFrom = ["all"];
-      defaultShared = true;
-      drivers = with pkgs; [epson-escpr2];
-    };
-    avahi = {
-      enable = true;
-      nssmdns = true;
-      publish = {
-        enable = true;
-        userServices = true;
-      };
-    };
-    avahi.openFirewall = true;
     flatpak.enable = true;
     ratbagd.enable = true;
     hardware.openrgb = {
@@ -224,81 +179,19 @@
         NMI_WATCHDOG = 0;
       };
     };
+    thermald.enable = true;
 
     upower.enable = true;
     gvfs.enable = true;
-    # needed for GNOME services outside of GNOME Desktop
     udev = {
-      # add support for CMSIS-DAP debug probes without root
-      # and add support for using numworks website
-      extraRules = ''
-        ACTION!="add|change", GOTO="probe_rs_rules_end"
-
-        SUBSYSTEM=="gpio", MODE="0660", GROUP="plugdev", TAG+="uaccess"
-
-        SUBSYSTEM!="usb|tty|hidraw", GOTO="probe_rs_rules_end"
-
-        ATTRS{product}=="*CMSIS-DAP*", MODE="660", GROUP="plugdev", TAG+="uaccess"
-
-        LABEL="probe_rs_rules_end"
-
-
-        SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="a291", TAG+="uaccess"
-        SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="df11", TAG+="uaccess"
-      '';
-      packages = with pkgs; [gnome.gnome-settings-daemon];
+      packages = with pkgs; [gnome.gnome-settings-daemon vial via qmk-udev-rules numworks-udev-rules picoprobe-udev-rules];
     };
   };
-
+  # This includes support for suspend-to-RAM and powersave features on laptops
+  powerManagement.enable = true;
+  # Enable powertop auto tuning on startup.
+  powerManagement.powertop.enable = false;
   xdg.portal.enable = true;
 
-  #nixpkgs.config.packageOverrides = pkgs: {
-  #  nur = import (builtins.fetchTarball "https://github.com/nix-community/NUR/archive/master.tar.gz") {
-  #    inherit pkgs;
-  #  };
-  #};
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  networking.firewall = {
-    enable = true;
-    allowedTCPPortRanges = [
-      {
-        from = 1714;
-        to = 1764;
-      } # KDE Connect
-    ];
-    allowedTCPPorts = [631];
-    allowedUDPPorts = [631];
-    allowedUDPPortRanges = [
-      {
-        from = 1714;
-        to = 1764;
-      } # KDE Connect
-    ];
-  };
-  #networking.wireless.iwd.enable = true;
-  #networking.networkmanager.wifi.backend = "iwd";
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "22.11"; # Did you read the comment?
+  system.stateVersion = "22.11";
 }

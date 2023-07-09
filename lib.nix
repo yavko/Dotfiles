@@ -7,17 +7,11 @@ inputs: let
     inherit (inputs) nix-colors;
   };
   mkExtraSpecialArgs = args: (defaultArgs // args);
-  substituters = let
-    nConf = (import ./flake.nix).nixConfig;
-  in {
-    urls = nConf.extra-substituters;
-    keys = nConf.extra-trusted-public-keys;
-  };
 in
   slib
   // lib
   // {
-    inherit mkExtraSpecialArgs substituters;
+    inherit mkExtraSpecialArgs;
     nixosExtraSpecialArgs = mkExtraSpecialArgs {
       inherit (self) lib;
     };
@@ -33,16 +27,18 @@ in
         hyprland-contrib.overlays.default
         hyprland.overlays.default
         #aagl.overlays.default
-        #neovim-nightly-overlay.overlay
-        #prismlauncher.overlay
+        neovim-nightly-overlay.overlay
+        #prismlauncher.overlays.default
         #hpr_scratcher.overlay.default
-        anyrun.overlay
+        #anyrun.overlay
         alejandra.overlay
-        nil.overlays.default
+        #nil.overlays.default
       ];
       nixpkgs.config.allowUnfreePredicate = pkg: true;
       nixpkgs.config = {
         allowUnfree = true;
+        allowBroken = false;
+        allowUnsupportedSystems = true;
       };
     };
   }

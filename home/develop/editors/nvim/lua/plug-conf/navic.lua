@@ -5,32 +5,32 @@ local navic = require('nvim-navic')
 
 navic.setup {
 	icons = {
-		File          = " ",
+		File          = "󰈙 ",
 		Module        = " ",
-		Namespace     = " ",
+		Namespace     = "󰌗 ",
 		Package       = " ",
-		Class         = " ",
-		Method        = " ",
+		Class         = "󰌗 ",
+		Method        = "󰆧 ",
 		Property      = " ",
 		Field         = " ",
 		Constructor   = " ",
-		Enum          = "練",
-		Interface     = "練",
-		Function      = " ",
-		Variable      = " ",
-		Constant      = " ",
+		Enum          = "󰕘",
+		Interface     = "󰕘",
+		Function      = "󰊕 ",
+		Variable      = "󰆧 ",
+		Constant      = "󰏿 ",
 		String        = " ",
-		Number        = " ",
+		Number        = "󰎠 ",
 		Boolean       = "◩ ",
-		Array         = " ",
-		Object        = " ",
-		Key           = " ",
-		Null          = "ﳠ ",
+		Array         = "󰅪 ",
+		Object        = "󰅩 ",
+		Key           = "󰌋 ",
+		Null          = "󰟢 ",
 		EnumMember    = " ",
-		Struct        = " ",
+		Struct        = "󰌗 ",
 		Event         = " ",
-		Operator      = " ",
-		TypeParameter = " ",
+		Operator      = "󰆕 ",
+		TypeParameter = "󰊄 ",
 	},
 	highlight = true,
 	separator = " > ",
@@ -67,7 +67,7 @@ M.get_filename = function()
 
 		vim.api.nvim_set_hl(0, hl_group, { fg = file_icon_color })
 		if M.isempty(file_icon) then
-			file_icon = ""
+			file_icon = "󰈔"
 		end
 
 		local buf_ft = vim.bo.filetype
@@ -85,7 +85,7 @@ M.get_filename = function()
 		end
 
 		if buf_ft == "dapui_watches" then
-			file_icon = ""
+			file_icon = "󰂥"
 		end
 
 		-- if buf_ft == "dapui_console" then

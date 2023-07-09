@@ -1,6 +1,7 @@
 {
   pkgs,
   config,
+  inputs,
   ...
 }: let
   h = config.home.homeDirectory;
@@ -35,6 +36,7 @@ in {
     downonspot
     picard
     lame
+    #(inputs.self.packages.${pkgs.hostPlatform.system}.open-utau)
     #mxlrc
   ];
   xdg.userDirs.music = "${h}/Music";
@@ -45,14 +47,16 @@ in {
       playlistDirectory = "${music}/playlists";
       extraConfig = ''
         audio_output {
-            	type "pipewire"
-            	name "PipeWire Sound Server"
+          type "pipewire"
+          name "PipeWire Sound Server"
         }
         audio_output {
-        	type "fifo"
-        	name "My fifo pipe"
-        	path "/tmp/mpd.fifo"
+          type "fifo"
+          name "My fifo pipe"
+          path "/tmp/mpd.fifo"
         }
+        replaygain "track"
+        replaygain_limit "no"
       '';
     };
     mpdris2 = {
@@ -62,7 +66,12 @@ in {
   programs = {
     ncmpcpp = {
       enable = true;
-      package = pkgs.ncmpcpp.override {visualizerSupport = true;};
+      package = pkgs.ncmpcpp.override {
+        visualizerSupport = true;
+        taglibSupport = true;
+        clockSupport = true;
+        outputsSupport = true;
+      };
     };
     beets = {
       enable = true;

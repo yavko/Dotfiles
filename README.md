@@ -77,6 +77,9 @@ maybe I'll publish and improve my implementation later on
 ## TODO
 - [ ] Add locking, and inhibiting of it
 
+## Credits
+ - Thankies [nyx](https://github.com/NotAShelf/nyx) for some securties stuffs
+
 [^fuf]: [His profile](https://github.com/fufexan/)
 [^hypr]: [Hyprland's repository](https://github.com/hyprwm/Hyprland/)
 [^anix]: [Agenix's repository](https://github.com/ryantm/agenix/)

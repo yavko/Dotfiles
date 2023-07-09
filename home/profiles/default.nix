@@ -14,7 +14,7 @@ self: {
     hyprland.homeManagerModules.default
     ironbar.homeManagerModules.default
     hpr_scratcher.homeManagerModules.default
-    hy3.homeManagerModules.default
+    anyrun.homeManagerModules.default
   ];
   homeImports = {
     "yavor@envious" = sharedModules ++ graphicalModules ++ [./envious/yavor.nix];

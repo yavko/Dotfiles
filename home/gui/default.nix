@@ -1,4 +1,9 @@
-{pkgs, ...} @ args: {
+{
+  pkgs,
+  inputs,
+  lib,
+  ...
+} @ args: {
   home.packages = with pkgs; [
     pantheon.pantheon-agent-polkit
     qalculate-gtk
@@ -15,12 +20,15 @@
     wl-clipboard
     itd
     xorg.xcursorgen
+    mullvad-vpn
+    nicotine-plus
+    opensnitch-ui
     #iwgtk
   ];
   imports = [
-    ./eww
+    #./eww
     ./dunst.nix
-    ./ironbar.nix
+    ./ironbar
     ./anyrun.nix
     ./hpr_scratcher.nix
     ./kvantum.nix
@@ -28,36 +36,21 @@
     ./wallpaper.nix
     ./xdg.nix
     ./productivity.nix
-    ./wl-screenrec.nix
+    #./wl-screenrec.nix
+    ./gtk.nix
   ];
 
   programs = {
-    firefox = {
-      enable = true;
-      #extensions = with pkgs.nur.repos.rycee.firefox-addons; {
-      #	stylus
-      #};
-    };
     zathura.enable = true;
-  };
-
-  home.pointerCursor = {
-    package = pkgs.catppuccin-cursors.mochaDark; #pkgs.bibata-cursors;
-    name = "Catppuccin-Mocha-Dark-Cursors"; #"Bibata-Modern-Classic";
-    size = 24;
-    gtk.enable = true;
-    x11.enable = true;
   };
 
   i18n.inputMethod.enabled = "fcitx5";
   i18n.inputMethod.fcitx5.addons = with pkgs; [fcitx5-mozc];
 
-  gtk = import ./gtk.nix args;
-
   wayland.windowManager.hyprland = {
     enable = true;
     extraConfig = import ./hyprland.nix args;
-    plugins.hy3.enable = true;
+    plugins = [inputs.hy3.packages.${pkgs.system}.hy3];
     #package = pkgs.hyprland-hidpi;
     xwayland = {
       enable = true;
@@ -71,8 +64,11 @@
       startInBackground = true;
     };
     kdeconnect.enable = true;
+    kdeconnect.indicator = true;
+    opensnitch-ui.enable = true;
   };
 
+  xsession.preferStatusNotifierItems = true;
   systemd.user.services.patheon-polkit = {
     Unit = {
       Description = "Pantheon Polkit Agent";
@@ -81,6 +77,14 @@
     Service = {
       Type = "simple";
       ExecStart = "${pkgs.pantheon.pantheon-agent-polkit}/libexec/policykit-1-pantheon/io.elementary.desktop.agent-polkit";
+    };
+    Install.WantedBy = ["hyprland-session.target"];
+  };
+  systemd.user.services.wl-clip-persist = {
+    Unit.Description = "Persistent clipboard for Wayland";
+    Service = {
+      ExecStart = "${lib.getExe pkgs.wl-clip-persist} --clipboard both";
+      Restart = "always";
     };
     Install.WantedBy = ["hyprland-session.target"];
   };

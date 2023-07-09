@@ -1,6 +1,6 @@
 {...}: {
   programs.hpr_scratcher = {
-    enable = true;
+    enable = false;
     scratchpads = {
       term = {
         command = "kitty --class kitty-dropterm";
@@ -13,5 +13,17 @@
         animation = "fromRight";
       };
     };
+    binds = {
+      volume = {
+        mods = "SUPER";
+        key = "P";
+        type = "toggle";
+      };
+    };
   };
+
+  wayland.windowManager.hyprland.extraConfig = ''
+    windowrule = float,^(pavucontrol)$
+    #windowrule = workspace special silent,^(pavucontrol)$
+  '';
 }

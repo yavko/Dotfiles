@@ -97,7 +97,7 @@
         # Treesitter
         (nvim-treesitter.withPlugins (_: pkgs.tree-sitter.allGrammars))
         nvim-treesitter-context
-        nvim-ts-rainbow
+        nvim-ts-rainbow2
         comment-nvim
         nvim-ts-autotag
         nvim-treesitter-endwise
@@ -124,19 +124,9 @@
         # My config
         config
       ];
-    #package = pkgs.neovim-nightly;
+    package = pkgs.neovim-nightly;
     extraPackages = with pkgs; [gcc ripgrep fd];
-    extraConfig = let
-      luaRequire = module:
-        builtins.readFile (builtins.toString ./lua + "/${module}.lua");
-      #luaConfig = builtins.concatStringsSep "\n" (map luaRequire [
-      #  "theme"
-      #  "options"
-      #  "ui"
-      #  "keymap"
-      #]);
-      #pluginConfigs = import ./lua/plug-conf args;
-    in ''
+    extraConfig = ''
       lua << EOF
       require("impatient")
       require("config")

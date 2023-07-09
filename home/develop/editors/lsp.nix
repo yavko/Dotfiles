@@ -1,11 +1,11 @@
 {
   pkgs,
-  config,
-  inputs,
+  lib,
   ...
 }: let
   servers = [
     "rust-analyzer"
+    #"nixd"
     "nil-ls"
     "tsserver"
     "bashls"
@@ -21,38 +21,34 @@
   ];
   genHelixLSP = {
     pkg,
-    args ? [],
-    ...
+    args ? [""],
   }: {
-    command = "${pkg}/bin/${pkg.meta.name}";
+    command = "${lib.meta.getExe pkg}";
+    inherit args;
   };
   generateHelixLang = name:
     if name == "bashls"
-    then {
-      name = name;
-      language-server = genHelixLSP {
+    then
+      genHelixLSP {
         pkg = pkgs.nodePackages.bash-language-server;
         args = ["start"];
-      };
-    }
-    #else if name == "nil-ls"
-    #then {
-    #  name = "nix";
-    #  language-server = genHelixLSP {pkg = inputs.nil.packages.${pkgs.system}.default;};
-    #}
+      }
+    #else if name == "nixd"
+    #then genHelixLSP {pkg = inputs.nixd.packages.${pkgs.system}.default;}
+    else if name == "nil-ls"
+    then genHelixLSP {pkg = pkgs.nil;} # inputs.nil.packages.${pkgs.system}.default;}
     else if pkgs ? name
-    then {
-      name = name;
-      language-server = genHelixLSP {pkg = pkgs.${name};};
-    }
-    else {
-      name = name;
-    };
+    then
+      genHelixLSP {
+        pkg = pkgs.${name};
+      }
+    else {command = name;};
+
   createAlias = newName: pkg: bin:
     pkgs.symlinkJoin {
       name = newName;
       paths = [(pkgs.writeShellScriptBin "${newName}" "${pkgs.${pkg}}/bin/${bin} $@") pkgs.${pkg}];
-      buildInputs = [pkgs.makeWrapper];
+      nativeBuildInputs = [pkgs.makeWrapper];
       postBuild = "wrapProgram $out/bin/${newName} --prefix PATH : $out/bin";
     };
   createAliasSame = newName: pkg: createAlias newName pkg pkg;
@@ -60,6 +56,9 @@
   jdtls = createAliasSame "jdtls" "jdt-language-server";
 in {
   home.packages = with pkgs; [
+    #nil
+    #(inputs.nixd.packages.${pkgs.system}.default)
+    #(inputs.nil.packages.${pkgs.system}.default)
     nil
     alejandra
     rust-analyzer
@@ -87,10 +86,20 @@ in {
         path;
     })
   ];
-  programs.helix.languages =
-    map (
+  programs.helix.languages = {
+    language = [
+      {
+        name = "bash";
+        auto-format = true;
+        formatter = {
+          command = "${pkgs.shfmt}/bin/shfmt";
+          args = ["-i" "2" "-"];
+        };
+      }
+    ];
+    language-server = lib.genAttrs servers (
       name:
         generateHelixLang name
-    )
-    servers;
+    );
+  };
 }

@@ -16,12 +16,12 @@ require("lsp_lines").setup()
 require('rust-tools').setup({})
 
 require('aerial').setup({
-  -- optionally use on_attach to set keymaps when aerial has attached to a buffer
-  on_attach = function(bufnr)
-    -- Jump forwards/backwards with '{' and '}'
-    vim.keymap.set('n', '{', '<cmd>AerialPrev<CR>', {buffer = bufnr})
-    vim.keymap.set('n', '}', '<cmd>AerialNext<CR>', {buffer = bufnr})
-  end
+	-- optionally use on_attach to set keymaps when aerial has attached to a buffer
+	on_attach = function(bufnr)
+		-- Jump forwards/backwards with '{' and '}'
+		vim.keymap.set('n', '{', '<cmd>AerialPrev<CR>', { buffer = bufnr })
+		vim.keymap.set('n', '}', '<cmd>AerialNext<CR>', { buffer = bufnr })
+	end
 })
 
 if nlsp_status then
@@ -120,7 +120,7 @@ for _, server in ipairs(servers) do
 		settings = {}
 	}
 	if server == "tsserver" then
---		config.root_dir = lspconfig.util.root_pattern("package.json")
+		--		config.root_dir = lspconfig.util.root_pattern("package.json")
 	elseif server == "denols" then
 		config.root_dir = lspconfig.util.root_pattern("deno.json")
 	elseif server == "jsonls" or server == "yamlls" then
@@ -141,21 +141,28 @@ for _, server in ipairs(servers) do
 				command = { "alejandra" }
 			}
 		}
+	elseif server == "nixd" then
+		config.autostart = true
+		config.settings["nixd"] = {
+			formatting = {
+				command = { "alejandra" }
+			}
+		}
 	elseif server == "lua_ls" then
 		config.settings["Lua"] = {
-      runtime = {
-        version = 'LuaJIT',
-      },
-      diagnostics = {
-        globals = {'vim'},
-      },
-      workspace = {
-        library = vim.api.nvim_get_runtime_file("", true),
-      },
-      telemetry = {
-        enable = false,
-      },
-    }
+			runtime = {
+				version = 'LuaJIT',
+			},
+			diagnostics = {
+				globals = { 'vim' },
+			},
+			workspace = {
+				library = vim.api.nvim_get_runtime_file("", true),
+			},
+			telemetry = {
+				enable = false,
+			},
+		}
 	elseif server == "rust_analyzer" then
 		config.settings["rust-analyzer"] = {
 			checkOnSave = {
@@ -179,7 +186,8 @@ vim.g.symbols_outline = {
 	show_relative_numbers = false,
 	show_symbol_details = true,
 	preview_bg_highlight = "Pmenu",
-	keymaps = { -- These keymaps can be a string or a table for multiple keys
+	keymaps = {
+	           -- These keymaps can be a string or a table for multiple keys
 		close = { "<Esc>", "q" },
 		goto_location = "<Cr>",
 		focus_location = "o",
@@ -191,24 +199,24 @@ vim.g.symbols_outline = {
 	lsp_blacklist = {},
 	symbol_blacklist = {},
 	symbols = {
-		File = { icon = "", hl = "TSURI" },
-		Module = { icon = "", hl = "TSNamespace" },
-		Namespace = { icon = "", hl = "TSNamespace" },
-		Package = { icon = "", hl = "TSNamespace" },
+		File = { icon = "󰈔", hl = "TSURI" },
+		Module = { icon = "󰆧", hl = "TSNamespace" },
+		Namespace = { icon = "󰅪", hl = "TSNamespace" },
+		Package = { icon = "󰏗", hl = "TSNamespace" },
 		Class = { icon = "𝓒", hl = "TSType" },
 		Method = { icon = "ƒ", hl = "TSMethod" },
 		Property = { icon = "", hl = "TSMethod" },
-		Field = { icon = "", hl = "TSField" },
+		Field = { icon = "󰆨", hl = "TSField" },
 		Constructor = { icon = "", hl = "TSConstructor" },
 		Enum = { icon = "ℰ", hl = "TSType" },
-		Interface = { icon = "ﰮ", hl = "TSType" },
+		Interface = { icon = "󰜰", hl = "TSType" },
 		Function = { icon = "λ", hl = "TSFunction" },
 		Variable = { icon = "", hl = "TSConstant" },
 		Constant = { icon = "", hl = "TSConstant" },
 		String = { icon = "𝓐", hl = "TSString" },
 		Number = { icon = "#", hl = "TSNumber" },
 		Boolean = { icon = "⊨", hl = "TSBoolean" },
-		Array = { icon = "", hl = "TSConstant" },
+		Array = { icon = "󰅪", hl = "TSConstant" },
 		Object = { icon = "⦿", hl = "TSType" },
 		Key = { icon = "🔐", hl = "TSType" },
 		Null = { icon = "NULL", hl = "TSType" },
@@ -220,56 +228,57 @@ vim.g.symbols_outline = {
 	},
 }
 require("trouble").setup({
-	position = "bottom", -- position of the list can be: bottom, top, left, right
-	height = 10, -- height of the trouble list when position is top or bottom
-	width = 50, -- width of the list when position is left or right
-	icons = true, -- use devicons for filenames
+	position = "bottom",           -- position of the list can be: bottom, top, left, right
+	height = 10,                   -- height of the trouble list when position is top or bottom
+	width = 50,                    -- width of the list when position is left or right
+	icons = true,                  -- use devicons for filenames
 	mode = "workspace_diagnostics", -- "workspace_diagnostics", "document_diagnostics", "quickfix", "lsp_references", "loclist"
-	fold_open = "", -- icon used for open folds
-	fold_closed = "", -- icon used for closed folds
-	group = true, -- group results by file
-	padding = true, -- add an extra new line on top of the list
-	action_keys = { -- key mappings for actions in the trouble list
+	fold_open = "",             -- icon used for open folds
+	fold_closed = "",           -- icon used for closed folds
+	group = true,                  -- group results by file
+	padding = true,                -- add an extra new line on top of the list
+	action_keys = {
+	                               -- key mappings for actions in the trouble list
 		-- map to {} to remove a mapping, for example:
 		-- close = {},
-		close = "q", -- close the list
-		cancel = "<esc>", -- cancel the preview and get back to your last window / buffer / cursor
-		refresh = "r", -- manually refresh
-		jump = { "<cr>", "<tab>" }, -- jump to the diagnostic or open / close folds
-		open_split = { "<c-x>" }, -- open buffer in new split
-		open_vsplit = { "<c-v>" }, -- open buffer in new vsplit
-		open_tab = { "<c-t>" }, -- open buffer in new tab
-		jump_close = { "o" }, -- jump to the diagnostic and close the list
-		toggle_mode = "m", -- toggle between "workspace" and "document" diagnostics mode
-		toggle_preview = "P", -- toggle auto_preview
-		hover = "K", -- opens a small popup with the full multiline message
-		preview = "p", -- preview the diagnostic location
-		close_folds = { "zM", "zm" }, -- close all folds
-		open_folds = { "zR", "zr" }, -- open all folds
-		toggle_fold = { "zA", "za" }, -- toggle fold of current file
-		previous = "k", -- preview item
-		next = "j", -- next item
+		close = "q",                    -- close the list
+		cancel = "<esc>",               -- cancel the preview and get back to your last window / buffer / cursor
+		refresh = "r",                  -- manually refresh
+		jump = { "<cr>", "<tab>" },     -- jump to the diagnostic or open / close folds
+		open_split = { "<c-x>" },       -- open buffer in new split
+		open_vsplit = { "<c-v>" },      -- open buffer in new vsplit
+		open_tab = { "<c-t>" },         -- open buffer in new tab
+		jump_close = { "o" },           -- jump to the diagnostic and close the list
+		toggle_mode = "m",              -- toggle between "workspace" and "document" diagnostics mode
+		toggle_preview = "P",           -- toggle auto_preview
+		hover = "K",                    -- opens a small popup with the full multiline message
+		preview = "p",                  -- preview the diagnostic location
+		close_folds = { "zM", "zm" },   -- close all folds
+		open_folds = { "zR", "zr" },    -- open all folds
+		toggle_fold = { "zA", "za" },   -- toggle fold of current file
+		previous = "k",                 -- preview item
+		next = "j",                     -- next item
 	},
-	indent_lines = true, -- add an indent guide below the fold icons
-	auto_open = false, -- automatically open the list when you have diagnostics
-	auto_close = false, -- automatically close the list when you have no diagnostics
-	auto_preview = true, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
-	auto_fold = false, -- automatically fold a file trouble list at creation
+	indent_lines = true,              -- add an indent guide below the fold icons
+	auto_open = false,                -- automatically open the list when you have diagnostics
+	auto_close = false,               -- automatically close the list when you have no diagnostics
+	auto_preview = true,              -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
+	auto_fold = false,                -- automatically fold a file trouble list at creation
 	auto_jump = { "lsp_definitions" }, -- for the given modes, automatically jump if there is only a single result
 	signs = {
 		-- icons / text used for a diagnostic
-		error = "",
+		error = "󰅚",
 		warning = "",
-		hint = "",
+		hint = "󰌶",
 		information = "",
-		other = "﫠",
+		other = "󰗡",
 	},
 	use_diagnostic_signs = false, -- enabling this will use the signs defined in your lsp client
 })
 
 require('crates').setup {
-    null_ls = {
-        enabled = true,
-        name = "crates.nvim",
-    },
+	null_ls = {
+		enabled = true,
+		name = "crates.nvim",
+	},
 }

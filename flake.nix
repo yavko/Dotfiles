@@ -2,6 +2,8 @@
   description = "Yavko's Dotfiles";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    nix-super.url = "github:privatevoid-net/nix-super";
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -32,7 +34,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.rust-overlay.follows = "rust-overlay";
     };
-    aagl.url = "/home/yavor/Projects/External/aagl-gtk-on-nix/";
+    aagl.url = "github:ezKEa/aagl-gtk-on-nix";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -56,11 +58,14 @@
       #inputs.flake-utils.follows = "fu";
       inputs.rust-overlay.follows = "rust-overlay";
     };
+    nixd = {
+      url = "github:nix-community/nixd";
+    };
     devshell.url = "github:numtide/devshell";
     ironbar = {
-      url = "github:JakeStanger/ironbar";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.rust-overlay.follows = "rust-overlay";
+      url = "github:JakeStanger/ironbar/";
+      #inputs.nixpkgs.follows = "nixpkgs";
+      #inputs.rust-overlay.follows = "rust-overlay";
     };
     anyrun = {
       url = "github:Kirottu/anyrun";
@@ -68,7 +73,7 @@
     };
     hpr_scratcher = {
       #url = "github:yavko/hpr_scratcher";
-      url = "/home/yavor/Projects/External/hpr-scratcher";
+      url = "/home/yavor/Projects/External/hpr-scratcher/nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hy3 = {
@@ -77,6 +82,15 @@
     };
     nix-index-database.url = "github:Mic92/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
+    nix-alien.url = "github:thiagokokada/nix-alien";
+    envfs.url = "github:Mic92/envfs";
+    envfs.inputs.nixpkgs.follows = "nixpkgs";
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote";
+
+      # Optional but recommended to limit the size of your system closure.
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     wallpkgs.url = "github:notashelf/wallpkgs";
 
     # non OS stuff
@@ -123,36 +137,15 @@
         ...
       }: {
         #legacyPackages.${system} = inputs.nixpkgs.legacyPackages.${system};
-        imports = [{_module.args.pkgs = inputs.nixpkgs.legacyPackages.${system};}];
+        imports = [{_module.args.pkgs = inputs.nixpkgs.legacyPackages.${system} // (inputs.self.packages.${system});}];
         devShells.default = inputs'.devshell.legacyPackages.mkShell {
           packages = [
             pkgs.alejandra
             pkgs.git
-            config.packages.repl
           ];
           name = "dots";
         };
         formatter = pkgs.alejandra;
       };
     };
-  nixConfig = {
-    extra-substituters = [
-      "https://nrdxp.cachix.org"
-      "https://hyprland.cachix.org"
-      "https://nix-community.cachix.org"
-      "https://helix.cachix.org"
-      "https://prismlauncher.cachix.org"
-      "https://jakestanger.cachix.org" # ironbar
-      "https://ezkea.cachix.org" # for aagl (if you know, you know)
-    ];
-    extra-trusted-public-keys = [
-      "nrdxp.cachix.org-1:Fc5PSqY2Jm1TrWfm88l6cvGWwz3s93c6IOifQWnhNW4="
-      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "helix.cachix.org-1:ejp9KQpR1FBI2onstMQ34yogDm4OgU2ru6lIwPvuCVs="
-      "prismlauncher.cachix.org-1:GhJfjdP1RFKtFSH3gXTIQCvZwsb2cioisOf91y/bK0w="
-      "jakestanger.cachix.org-1:VWJE7AWNe5/KOEvCQRxoE8UsI2Xs2nHULJ7TEjYm7mM=" # ironbar
-      "ezkea.cachix.org-1:ioBmUbJTZIKsHmWWXPe1FSFbeVe+afhfgqgTSNd34eI=" # aagl (if you know, you know)
-    ];
-  };
 }

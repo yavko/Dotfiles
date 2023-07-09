@@ -1,5 +1,9 @@
-{pkgs, ...}: let
-  _patched-glfw = with pkgs; let
+{
+  pkgs,
+  inputs,
+  ...
+}: let
+  patched-glfw = with pkgs; let
     mcWaylandPatchRepo = fetchFromGitHub {
       owner = "Admicos";
       repo = "minecraft-wayland";
@@ -16,14 +20,13 @@
     glfw-wayland.overrideAttrs (previousAttrs: {
       patches = previousAttrs.patches ++ mcWaylandPatches;
     });
-  new = with pkgs;
-    prismlauncher-qt5.override {
-      jdks = with pkgs; [graalvm17-ce jdk17 jdk8];
-    };
+  prism = inputs.prismlauncher.packages.${pkgs.hostPlatform.system}.prismlauncher-qt5;
 in {
   home.packages = with pkgs; [
+    #patched-glfw
     grapejuice
-    new
+    prism
     piper
+    osu-lazer-bin
   ];
 }

@@ -22,95 +22,118 @@
       fi
     '';
   };
-  hpr_scratcher-path = "${config.programs.hpr_scratcher.package}/bin/hpr-scratcher";
+  sosd = arg: val: "${pkgs.swayosd}/bin/swayosd --${arg} ${val}";
 in ''
-    # Variables
-    $mod = SUPER
+  # Variables
+  $mod = SUPER
 
-    # Display stuff
-    monitor = eDP-1, highres, auto, 2
+  # Display stuff
+  monitor = eDP-1, highres, auto, 2
 
-     general {
-       gaps_in = 5
-       gaps_out = 5
-       border_size = 2
-       col.active_border = 0x${xargb x.base06} # white
-       col.inactive_border = 0x${xargb x.base02} # black
-     }
+   general {
+     gaps_in = 5
+     gaps_out = 5
+     border_size = 2
+     col.active_border = 0x${xargb x.base06} # white
+     col.inactive_border = 0x${xargb x.base02} # black
+   }
 
-         decoration {
-           rounding = 16
-           blur = 1
-           blur_size = 3
-           blur_passes = 3
-           blur_new_optimizations = 1
-           drop_shadow = 1
-           shadow_ignore_window = 1
-           shadow_offset = 2 2
-           shadow_range = 4
-           shadow_render_power = 1
-           col.shadow = 0x55000000
-           screen_shader = ${shader_path}
-         }
+       decoration {
+         rounding = 16
+         blur = false
+         drop_shadow = 1
+         shadow_ignore_window = 1
+         shadow_offset = 0 5
+         shadow_range = 50
+         shadow_render_power = 3
+         col.shadow = rgba(00000099)
+         #screen_shader = ${shader_path}
+       }
 
-         animations {
-           enabled = 1
-           animation = border, 1, 2, default
-           animation = fade, 1, 4, default
-           animation = windows, 1, 3, default, popin 80%
-           animation = workspaces, 1, 2, default, slide
-         }
+       animations {
+         enabled = 1
+         animation = border, 1, 2, default
+         animation = fade, 1, 4, default
+         animation = windows, 1, 3, default, popin 80%
+         animation = workspaces, 1, 2, default, slide
+       }
 
-         # Window rules
-         windowrulev2 = float, title:^(Picture-in-Picture)$
-         windowrulev2 = pin, title:^(Picture-in-Picture)$
-         windowrulev2 = workspace silent special, title:^(Firefox — Sharing Indicator)$
-         windowrulev2 = tile, title:^(.*is sharing (your screen|a window)\.)$
-         windowrulev2 = workspace silent 10, title:^(.*is sharing (your screen|a window)\.)$
+       # Window rules
+       windowrulev2 = float, title:^(Picture-in-Picture)$
+       windowrulev2 = pin, title:^(Picture-in-Picture)$
 
-    		# Mouse binds
-    		bindm = $mod, mouse:272, movewindow
-    		bindm = $mod, mouse:273, resizewindow
+       windowrulev2 = workspace special silent, title:^(Firefox — Sharing Indicator)$
+       windowrulev2 = workspace special silent, title:^(.*is sharing (your screen|a window)\.)$
 
-    		# Key bindings
-    		bind = $mod, Q , exec, kitty
-    		bind = $mod, C, killactive
-    		bind = $mod, R, exec, zsh -c 'rofi -show drun'
-    		bind = $mod, M, exit
-    		bind = $mod, V, togglefloating
-    		bind = $mod SHIFT, equal, exec, ${toggle_script}/bin/shader_toggler
+  	 # fix xwayland apps
+  	 windowrulev2 = rounding 0, xwayland:1, floating:1
+  		# Mouse binds
+  		bindm = $mod, mouse:272, movewindow
+  		bindm = $mod, mouse:273, resizewindow
 
-    	exec-once = ${hpr_scratcher-path}
-  			bind = $mod,P,exec,${hpr_scratcher-path} toggle volume
-  windowrule = float,^(pavucontrol)$
-  windowrule = workspace special silent,^(pavucontrol)$
+  		# Key bindings
+  		bind = $mod, Q , exec, kitty
+  		bind = $mod, C, killactive
+  		bind = $mod, R, exec, zsh -c 'rofi -show drun'
+  		bind = $mod, M, exit
+  		bind = $mod, V, togglefloating
+  		bind = $mod SHIFT, equal, exec, ${toggle_script}/bin/shader_toggler
 
-         # media controls
-         bindl = , XF86AudioPlay, exec, playerctl -a play-pause
-         bindl = , XF86AudioPrev, exec, playerctl previous
-         bindl = , XF86AudioNext, exec, playerctl next
 
-         # volume
-         bindle = , XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 6%+
-         bindle = , XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 6%-
-         bindl = , XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
-         bindl = , XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+  	# control windows
+  	general:layout = hy3
+  	bind = $mod, W,submap,windowctl
+  	submap = windowctl
 
-         # backlight
-         bindle = , XF86MonBrightnessUp, exec, brightnessctl s +10%
-         bindle = , XF86MonBrightnessDown, exec, brightnessctl s 10%-
+  	bind=,v,hy3:makegroup,v
+  	bind=,v,submap,reset
 
-         # screenshot
-         $screenshotarea = hyprctl keyword animation "fadeOut,0,0,default"; grimblast --notify copysave area; hyprctl keyword animation "fadeOut,1,4,default"
-         bind = , Print, exec, $screenshotarea
-         #bind = $mod SHIFT, R, exec, $screenshotarea
-         #bind = CTRL, Print, exec, grimblast --notify --cursor copysave output
-         #bind = $mod SHIFT CTRL, R, exec, grimblast --notify --cursor copysave output
-         #bind = ALT, Print, exec, grimblast --notify --cursor copysave screen
-         #bind = $mod SHIFT ALT, R, exec, grimblast --notify --cursor copysave screen
+  	bind=,right,hy3:movefocus,right
+  	bind=,right,submap,reset
 
-     	  # workspaces
-     		${builtins.concatStringsSep "\n" (builtins.genList (
+  	bind=,left,hy3:movefocus,left
+  	bind=,left,submap,reset
+
+  	bind=,up,hy3:movefocus,up
+  	bind=,up,submap,reset
+
+  	bind=,down,hy3:movefocus,down
+  	bind=,down,submap,reset
+
+  	bind=,s,hy3:makegroup,h
+  	bind=,s,submap,reset
+
+  	submap = reset
+
+       # media controls
+       bindl = , XF86AudioPlay, exec, playerctl -a play-pause
+       bindl = , XF86AudioPrev, exec, playerctl previous
+       bindl = , XF86AudioNext, exec, playerctl next
+
+       # volume
+       bindle = , XF86AudioRaiseVolume, exec,${sosd "output-volume" "+6"}
+       bindle = , XF86AudioLowerVolume,exec,${sosd "output-volume" "-6"}
+       bindl = , XF86AudioMute, exec,${sosd "output-volume" "mute-toggle"}
+       bindl = , XF86AudioMicMute, exec,${sosd "input-volume" "mute-toggle"}
+
+       # backlight
+       bindle = , XF86MonBrightnessUp, exec,${sosd "brightness" "+10"}
+       bindle = , XF86MonBrightnessDown, exec,${sosd "brightness" "-10"}
+
+       # cAPS lOCK
+       bindr = , Caps_Lock, exec,${sosd "caps-lock" ""}
+
+  	 # screenshot
+       $screenshotarea = hyprctl keyword animation "fadeOut,0,0,default"; grimblast --notify copysave area; hyprctl keyword animation "fadeOut,1,4,default"
+       bind = , Print, exec, $screenshotarea
+       #bind = $mod SHIFT, R, exec, $screenshotarea
+       #bind = CTRL, Print, exec, grimblast --notify --cursor copysave output
+       #bind = $mod SHIFT CTRL, R, exec, grimblast --notify --cursor copysave output
+       #bind = ALT, Print, exec, grimblast --notify --cursor copysave screen
+       #bind = $mod SHIFT ALT, R, exec, grimblast --notify --cursor copysave screen
+
+   	  # workspaces
+   		${builtins.concatStringsSep "\n" (builtins.genList (
       x: let
         ws = let
           c = (x + 1) / 10;

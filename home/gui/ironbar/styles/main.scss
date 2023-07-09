@@ -1,0 +1,218 @@
+@use "colors" as *;
+
+* {
+  font-family: Product Sans, Roboto, sans-serif, monospace;
+  font-size: 13px;
+  transition: 200ms ease;
+
+  color: $fg;
+  /*background-color: #2d2d2d;*/
+  /*background-color: $bg;*/
+  border: none;
+
+  /*opacity: 0.4;*/
+}
+
+#bar {
+  background-color: $bg;
+}
+
+.container {
+  background-color: $bg;
+}
+
+
+#right > * + * {
+  margin-left: 20px;
+}
+
+#left > * + * {
+  margin-right: 20px;
+}
+.nix-launcher button {
+  all: unset;
+  background-color: $bg;
+}
+.popup-nix-launcher label {
+	font-family: monospace;
+}
+
+.nix-launcher label {
+  background-color: transparent;
+  color: $bg;
+  font-family: monospace;
+  font-size: 1.5rem;
+  padding: 0 1.1rem 0 0.5rem;
+}
+
+.workspaces {
+  all: unset;
+  margin-left: 10px;
+}
+.workspaces label {
+  font-family: Material Symbols Outlined;
+  font-size: 0.9rem;
+}
+.workspaces .item {
+  all: unset;
+  color: $pink;
+  margin-right: 5px;
+  padding: 0px;
+  font-family: Material Symbols Outlined;
+  border-radius: 20px;
+}
+
+.workspaces .item.focused {
+	color: $red;
+}
+.workspaces .item.focused label {
+  font-size: 1.2rem;
+}
+.workspaces .item.inactive {
+	color: $maroon;
+}
+.workspaces .item.inactive label {
+  font-size: 0.5rem;
+}
+
+.clock {
+  color: $fg;
+  background-color: $bg;
+  font-weight: bold;
+}
+
+.sysinfo {
+  color: $fg;
+}
+
+.tray {
+  background-color: $bg;
+}
+
+.tray .item {
+  background-color: $bg;
+  -gtk-icon-effect: dim;
+}
+
+.upower,
+.upower * {
+  all: unset;
+  background-color: $bg;
+  color: $fg;
+}
+.music-img {
+  border-radius: 8px;
+  margin-right: 8px;
+}
+.music-ctrls * {
+  all: unset;
+  margin-left: 10px;
+}
+
+.music {
+  background-color: $bg;
+  color: $fg;
+}
+.music label {
+  font-size: 16px;
+}
+
+.popup {
+  background-color: $bg;
+  border: 1px solid $subtext0;
+}
+
+.popup-clock {
+  padding: 1em;
+}
+
+.calendar-clock {
+  color: $fg;
+  font-size: 2.5em;
+  padding-bottom: 0.1em;
+}
+
+.calendar {
+  background-color: $bg;
+  color: $fg;
+}
+
+.calendar .header {
+  padding-top: 1em;
+  border-top: 1px solid $subtext0;
+  font-size: 1.5em;
+}
+
+.calendar:selected {
+  background-color: $blue;
+}
+
+.power-menu {
+  margin-left: 10px;
+}
+
+.power-menu .power-btn {
+  color: $fg;
+  background-color: $bg;
+}
+
+.power-menu .power-btn:hover {
+  background-color: $mantle;
+}
+
+.popup-power-menu {
+  padding: 1em;
+}
+
+.popup-power-menu #header {
+  color: $fg;
+  font-size: 1.4em;
+  border-bottom: 1px solid $overlay1;
+  padding-bottom: 0.4em;
+  margin-bottom: 0.8em;
+}
+
+.popup-power-menu .power-btn {
+  color: $fg;
+  background-color: $bg;
+  border: 1px solid $overlay1;
+  padding: 0.6em 1em;
+}
+
+.popup-power-menu .power-btn + .power-btn {
+  margin-left: 1em;
+}
+
+.popup-power-menu .power-btn:hover {
+  background-color: $mantle;
+}
+
+.music {
+  all: unset;
+  color: $fg;
+  font-size: 16px;
+}
+
+.popup-music .album-art {
+  margin-right: 1em;
+  border-radius: 20px;
+}
+
+.popup-music .title .icon-box,
+.popup-mpd .title .icon-icon {
+  font-size: 1.7em;
+}
+
+.popup-music .controls * {
+  border-radius: 0;
+  background-color: transparent;
+  color: $fg;
+}
+
+.popup-music .controls *:disabled {
+  color: $overlay1;
+}
+
+.focused {
+  color: $fg;
+}

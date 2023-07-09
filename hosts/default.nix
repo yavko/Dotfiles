@@ -14,6 +14,12 @@ inputs: let
     agenix.nixosModules.default
     nur.nixosModules.nur
     nix-index-database.nixosModules.nix-index
+    envfs.nixosModules.envfs
+    ../modules/booting.nix
+    ../modules/security.nix
+    ../modules/compat.nix
+    ../modules/network
+    ../modules/nix-daemon.nix
     {
       home-manager = {
         useGlobalPkgs = true;
@@ -26,7 +32,9 @@ inputs: let
     hyprland.nixosModules.default
     ../modules/fonts.nix
     ../modules/greetd.nix
+    ../modules/firefox.nix
     aagl.nixosModules.default
+    chaotic.nixosModules.default
   ];
   specialArgs = nixosExtraSpecialArgs;
 in {
@@ -34,6 +42,7 @@ in {
     modules =
       [
         ./envious
+        inputs.lanzaboote.nixosModules.lanzaboote
         {home-manager.users.yavor.imports = homeImports."yavor@envious";}
       ]
       ++ sharedModules

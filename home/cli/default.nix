@@ -32,6 +32,8 @@
       "--color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8"
     ];
   };
+  programs.direnv.enable = true;
+  programs.direnv.nix-direnv.enable = true;
   programs.nix-index.enable = true;
   programs.command-not-found.enable = false;
 }

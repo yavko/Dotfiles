@@ -26,7 +26,10 @@
       #ytdl-raw-options="external-downloader=aria2c";
       #ytdl-raw-options="external-downloader-args=-c -j 3 -x 3 -s 3 -k 1M";
 
-      hwdec = "vaapi";
+      hwdec = "auto-safe";
+      vo = "gpu";
+      profile = "gpu-hq";
+      gpu-context = "wayland";
     };
     scripts = with pkgs.mpvScripts; [mpris thumbnail];
   };

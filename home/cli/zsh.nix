@@ -99,27 +99,30 @@
       ZSH_AUTOSUGGEST_STRATEGY = ["history" "completion"];
     };
     initExtra = ''
-      setopt INTERACTIVE_COMMENTS
+           setopt INTERACTIVE_COMMENTS
 
-           # disable sort when completing `git checkout`
-           zstyle ':completion:*:git-checkout:*' sort false
+                # disable sort when completing `git checkout`
+                zstyle ':completion:*:git-checkout:*' sort false
 
-           # set list-colors to enable filename colorizing
-           zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
+                # set list-colors to enable filename colorizing
+                zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
 
-           # preview directory's content with exa when completing cd
-           zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always --icons $realpath'
+                # preview directory's content with exa when completing cd
+                zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always --icons $realpath'
 
-           # switch group using `,` and `.`
-           zstyle ':fzf-tab:*' switch-group ',' '.'
+                # switch group using `,` and `.`
+                zstyle ':fzf-tab:*' switch-group ',' '.'
 
-           zstyle ':fzf-tab:complete:*:*' fzf-preview 'less ''${(Q)realpath}'
+                zstyle ':fzf-tab:complete:*:*' fzf-preview 'less ''${(Q)realpath}'
 
-           zstyle -d ':completion:*' format
+                zstyle -d ':completion:*' format
 
-           zstyle ':completion:*:descriptions' format '[%d]'
+                zstyle ':completion:*:descriptions' format '[%d]'
 
-        export LS_COLORS="$(vivid generate catppuccin-mocha)"
+             export LS_COLORS="$(vivid generate catppuccin-mocha)"
+         bindkey "^[[1;5C" forward-word
+         bindkey "^[[1;5D" backward-word
+      eval "$(${pkgs.direnv}/bin/direnv hook zsh)"
     '';
     shellAliases = {
       cavaw = "kitty  --override font_size=0 --execute cava &";

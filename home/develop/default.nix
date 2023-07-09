@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  config,
+  ...
+}: {
   imports = [
     ./editors
   ];
@@ -8,6 +12,12 @@
     neovide
     gh
   ];
+  programs.ssh = {
+    enable = true;
+    # extraConfig = ''
+    #   IdentityAgent ${config.home.homeDirectory}/.1password/agent.sock
+    # '';
+  };
   programs.git = {
     enable = true;
     difftastic = {
@@ -27,6 +37,7 @@
     ignores = ["*~" "*.swp" "*result*" ".direnv" "node_modules"];
     signing = {
       key = "F07D19A32407F857";
+      #key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEDGzxjYoalywVSGUXuU6cBDhuwgIIpElTjkz9fpBIxJ";
       signByDefault = true;
     };
     userEmail = "yavornkolev@gmail.com";
