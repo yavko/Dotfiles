@@ -7,6 +7,7 @@ self: {
   sharedModules = [
     inputs.nix-colors.homeManagerModule
     inputs.nix-index-database.hmModules.nix-index
+    inputs.neovim-flake.homeManagerModules.default
     ../../secrets/home.nix
     ../../home.nix
   ];

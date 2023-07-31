@@ -1,11 +1,9 @@
-{
-  pkgs,
-  config,
-  ...
-}: {
+{pkgs, ...}: {
   imports = [
-    ./editors
+    # ./editors
+    ./neovim-flake.nix
   ];
+
   home.packages = with pkgs; [
     rust-bin.nightly.latest.default
     cargo-generate

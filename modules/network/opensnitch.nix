@@ -140,6 +140,12 @@
       }
       ips
       rulename;
+    mkIPRegex = regex: _: {
+      type = "regexp";
+      operand = "dest.ip";
+      sensitive = false;
+      data = regex;
+    };
     mkIP = ip: {
       type = "simple";
       operand = "dest.ip";
@@ -182,13 +188,14 @@
     allow-mullvad-gui = {
       path = "${pkgs.mullvad-vpn}/share/mullvad/mulvad-gui";
     };
+    # curl.def = {
+    #   path = "${pkgs.curl}/bin/curl";
+    # };
+
     avahi-daemon.def = {
       path = "${pkgs.avahi}/bin/avahi-daemon";
       ports = mkPort "5353";
-      ips = mkIPs [
-        "ff02::fb"
-        "224.0.0.251"
-      ];
+      ips = mkIPRegex "^(ff02::fb|224\\.0\\.0\\.251|fe80::.*|169\\.254\\..*)$";
     };
     cups-browsed.def = {
       path = "${pkgs.cups-filters}/bin/cups-browsed";
@@ -221,14 +228,14 @@
     };
     allow-dnscrypt-proxy = {
       path = "${pkgs.dnscrypt-proxy2}/bin/dnscrypt-proxy";
-      #ports = mkPortRegex "^(443|8443|80)$";
+      ports = mkPortRegex "^(443|8443|80|54)$";
     };
     allow-networkmanager = {
       path = "${pkgs.networkmanager}/bin/NetworkManager";
     };
     firefox-common.def = {
       path = "${pkgs.firefox}/lib/firefox/firefox";
-      ports = mkPortRegex "^(53|80|443|50007)$";
+      ports = mkPortRegex "^(53|80|443|50007|50004)$";
     };
 
     osu-allow-domains.def = {

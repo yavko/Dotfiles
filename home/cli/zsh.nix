@@ -119,10 +119,11 @@
 
                 zstyle ':completion:*:descriptions' format '[%d]'
 
-             export LS_COLORS="$(vivid generate catppuccin-mocha)"
-         bindkey "^[[1;5C" forward-word
-         bindkey "^[[1;5D" backward-word
+      export LS_COLORS="$(vivid generate catppuccin-mocha)"
+      bindkey "^[[1;5C" forward-word
+      bindkey "^[[1;5D" backward-word
       eval "$(${pkgs.direnv}/bin/direnv hook zsh)"
+      source <(${pkgs.carapace}/bin/carapace _carapace)
     '';
     shellAliases = {
       cavaw = "kitty  --override font_size=0 --execute cava &";

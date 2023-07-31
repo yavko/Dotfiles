@@ -20,6 +20,7 @@ inputs: let
     ../modules/compat.nix
     ../modules/network
     ../modules/nix-daemon.nix
+		./impurity-module.nix
     {
       home-manager = {
         useGlobalPkgs = true;
@@ -37,7 +38,7 @@ inputs: let
     chaotic.nixosModules.default
   ];
   specialArgs = nixosExtraSpecialArgs;
-in {
+in rec {
   envious = nixosSystem {
     modules =
       [
@@ -50,4 +51,5 @@ in {
     system = "x86_64-linux";
     inherit specialArgs;
   };
+  envious-impure = envious.extendModules {modules = [{impurity.enable = true;}];};
 }

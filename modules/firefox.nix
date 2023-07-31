@@ -10,10 +10,22 @@
     };
   };
   environment.etc."firejail/firefox.local".text = ''
+    whitelist ~/Music
+    noblacklist ~/Music
+    whitelist /run/wrappers/bin/1Password-BrowserSupport
+    noblacklist /run/wrappers/bin/1Password-BrowserSupport
+    whitelist /run/wrappers/bin/1Password-KeyringHelper
+    noblacklist /run/wrappers/bin/1Password-KeyringHelper
+    whitelist ''${HOME}/.gnupg
+    noblacklist ''${HOME}/.gnupg
+
     dbus-user.talk org.freedesktop.Notifications
     dbus-user.talk org.freedesktop.ScreenSaver
     dbus-user.talk org.freedesktop.portal.Desktop
+    dbus-user.talk org.freedesktop.portal.Fcitx
+    browser-allow-drm yes
     ignore noroot
+    ignore nou2f
   '';
   #programs.firefox.enable = true;
   #programs.firefox.package = null;

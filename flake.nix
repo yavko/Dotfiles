@@ -12,16 +12,21 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    impurity.url = "github:outfoxxed/impurity.nix";
+    wrapper-manager = {
+      url = "github:viperML/wrapper-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     agenix.url = "github:yaxitech/ragenix";
     hyprland.url = "github:hyprwm/Hyprland/"; #2cbb10d850f0860fcb1c940ebc047c7c4deb9e91";
     helix.url = "github:helix-editor/helix";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
-    /*
-      neovim-flake = {
-      url = "github:notashelf/neovim-flake/fixHomeManager";
+
+    neovim-flake = {
+      url = "github:notashelf/neovim-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    */
+
     prismlauncher.url = "github:PrismLauncher/PrismLauncher";
     nix-colors.url = "github:Misterio77/nix-colors";
     #fu.url = "github:numtide/flake-utils";
